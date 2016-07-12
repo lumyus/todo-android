@@ -8,6 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app-singleactivity" />
             <option value="$PROJECT_DIR$/app-traditional" />
             <option value="$PROJECT_DIR$/datasource" />
           </set>
@@ -15,6 +16,7 @@
         <option name="myModules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app-singleactivity" />
             <option value="$PROJECT_DIR$/app-traditional" />
             <option value="$PROJECT_DIR$/datasource" />
           </set>

@@ -3,7 +3,7 @@
 buildscript {
     ext.dep = [
             compileSdk: 23,
-            minSdk    : 15,
+            minSdk    : 16,
             targetSdk : 23,
             buildTools: "23.0.1",
 

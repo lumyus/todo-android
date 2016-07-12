@@ -6,7 +6,7 @@ android {
     buildToolsVersion dep.buildTools
 
     defaultConfig {
-        applicationId "net.xaethos.todofrontend.traditional"
+        applicationId "net.xaethos.todofrontend.singleactivity"
         minSdkVersion dep.minSdk
         targetSdkVersion dep.targetSdk
         versionCode 1
@@ -41,5 +41,13 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dep.dagger"
     compile "com.google.dagger:dagger:$dep.dagger"
 
+    // Conductor
+    compile 'com.bluelinelabs:conductor:2.0.0'
+    compile 'com.bluelinelabs:conductor-rxlifecycle:2.0.0'
+
+    testCompile "org.jetbrains.kotlin:kotlin-test:$dep.kotlin"
+
     testCompile "junit:junit:$dep.junit"
+
+    testCompile "org.mockito:mockito-core:1.10.19"
 }

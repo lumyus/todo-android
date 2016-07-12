@@ -1,1 +1,1 @@
-include ':app-traditional', ':datasource'
+include ':app-traditional', ':datasource', ':app-singleactivity'
