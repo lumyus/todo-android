@@ -2,19 +2,15 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "24.0.0"
+    compileSdkVersion dep.compileSdk
+    buildToolsVersion dep.buildTools
 
     defaultConfig {
         applicationId "net.xaethos.todofrontend"
-        minSdkVersion 9
-        targetSdkVersion 23
+        minSdkVersion dep.minSdk
+        targetSdkVersion dep.targetSdk
         versionCode 1
         versionName "1.0"
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
     }
 
     buildTypes {
@@ -25,15 +21,25 @@ android {
     }
 }
 
+kapt {
+    generateStubs = true
+}
+
 dependencies {
     compile project(':datasource')
 
     compile "org.jetbrains.kotlin:kotlin-stdlib:$dep.kotlin"
 
+    // Android Support
     compile "com.android.support:appcompat-v7:$dep.support"
     compile "com.android.support:support-v4:$dep.support"
     compile "com.android.support:recyclerview-v7:$dep.support"
     compile "com.android.support:design:$dep.support"
+
+    // Dagger
+    provided 'javax.annotation:jsr250-api:1.0'
+    kapt "com.google.dagger:dagger-compiler:$dep.dagger"
+    compile "com.google.dagger:dagger:$dep.dagger"
 
     testCompile "junit:junit:$dep.junit"
 }

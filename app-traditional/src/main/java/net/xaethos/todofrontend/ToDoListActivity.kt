@@ -12,7 +12,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import net.xaethos.todofrontend.datasource.ToDoData
-import net.xaethos.todofrontend.dummy.DummyContent
+import net.xaethos.todofrontend.datasource.ToDoDataSource
+import javax.inject.Inject
 
 /**
  * An activity representing a list of ToDos. This activity
@@ -24,6 +25,8 @@ import net.xaethos.todofrontend.dummy.DummyContent
  */
 class ToDoListActivity : AppCompatActivity() {
 
+    @Inject lateinit var dataSource: ToDoDataSource
+
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -33,6 +36,8 @@ class ToDoListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_todo_list)
+
+        singletonComponent.inject(this)
 
         val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
@@ -57,7 +62,7 @@ class ToDoListActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(DummyContent.ITEMS)
+        recyclerView.adapter = SimpleItemRecyclerViewAdapter(dataSource.allItems)
     }
 
     inner class SimpleItemRecyclerViewAdapter(private val values: List<ToDoData>) :

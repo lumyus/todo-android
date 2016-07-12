@@ -8,7 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import net.xaethos.todofrontend.datasource.ToDoData
-import net.xaethos.todofrontend.dummy.DummyContent
+import net.xaethos.todofrontend.datasource.ToDoDataSource
+import javax.inject.Inject
 
 /**
  * A fragment representing a single ToDo detail screen.
@@ -18,6 +19,8 @@ import net.xaethos.todofrontend.dummy.DummyContent
  */
 class ToDoDetailFragment : Fragment() {
 
+    @Inject lateinit var dataSource: ToDoDataSource
+
     /**
      * The dummy content this fragment is presenting.
      */
@@ -26,11 +29,14 @@ class ToDoDetailFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        singletonComponent.inject(this)
+
         if (arguments.containsKey(ARG_ITEM_ID)) {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-            val item = DummyContent.ITEM_MAP[arguments.getString(ARG_ITEM_ID)]
+            val itemId = arguments.getString(ARG_ITEM_ID)
+            val item: ToDoData? = dataSource[itemId]
 
             val appBarLayout = activity.findViewById(R.id.toolbar_layout) as CollapsingToolbarLayout?
             appBarLayout?.title = item?.title
