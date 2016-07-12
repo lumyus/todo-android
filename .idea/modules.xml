@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ToDoFrontend.iml" filepath="$PROJECT_DIR$/ToDoFrontend.iml" />
       <module fileurl="file://$PROJECT_DIR$/app-traditional/app-traditional.iml" filepath="$PROJECT_DIR$/app-traditional/app-traditional.iml" />
+      <module fileurl="file://$PROJECT_DIR$/datasource/datasource.iml" filepath="$PROJECT_DIR$/datasource/datasource.iml" />
     </modules>
   </component>
 </project>

@@ -1,1 +1,1 @@
-include ':app-traditional'
+include ':app-traditional', ':datasource'

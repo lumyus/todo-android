@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
@@ -6,15 +6,10 @@ android {
     buildToolsVersion "24.0.0"
 
     defaultConfig {
-        applicationId "net.xaethos.todofrontend"
         minSdkVersion 9
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
     }
 
     buildTypes {
@@ -29,9 +24,6 @@ dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib:$dep.kotlin"
 
     compile "com.android.support:appcompat-v7:$dep.support"
-    compile "com.android.support:support-v4:$dep.support"
-    compile "com.android.support:recyclerview-v7:$dep.support"
-    compile "com.android.support:design:$dep.support"
 
     testCompile "junit:junit:$dep.junit"
 }
