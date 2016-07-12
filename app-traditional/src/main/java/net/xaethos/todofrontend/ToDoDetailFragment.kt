@@ -37,6 +37,7 @@ class ToDoDetailFragment : Fragment() {
             // to load content from a content provider.
             val itemId = arguments.getString(ARG_ITEM_ID)
             val item: ToDoData? = dataSource[itemId]
+            this.item = item
 
             val appBarLayout = activity.findViewById(R.id.toolbar_layout) as CollapsingToolbarLayout?
             appBarLayout?.title = item?.title
