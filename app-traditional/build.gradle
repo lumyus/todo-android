@@ -26,6 +26,8 @@ android {
 }
 
 dependencies {
+    compile project(':datasource')
+
     compile "org.jetbrains.kotlin:kotlin-stdlib:$dep.kotlin"
 
     compile "com.android.support:appcompat-v7:$dep.support"

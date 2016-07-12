@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import net.xaethos.todofrontend.datasource.ToDoData
 import net.xaethos.todofrontend.dummy.DummyContent
 
 /**
@@ -59,7 +60,7 @@ class ToDoListActivity : AppCompatActivity() {
         recyclerView.adapter = SimpleItemRecyclerViewAdapter(DummyContent.ITEMS)
     }
 
-    inner class SimpleItemRecyclerViewAdapter(private val values: List<DummyContent.DummyItem>) :
+    inner class SimpleItemRecyclerViewAdapter(private val values: List<ToDoData>) :
             RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -69,14 +70,14 @@ class ToDoListActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
-            holder.idView.text = item.id
-            holder.contentView.text = item.content
+            holder.idView.text = item.url
+            holder.contentView.text = item.title
 
             holder.itemView.setOnClickListener { v ->
                 if (twoPane) {
                     val fragment = ToDoDetailFragment()
                     fragment.arguments = Bundle().apply {
-                        putString(ToDoDetailFragment.ARG_ITEM_ID, item.id)
+                        putString(ToDoDetailFragment.ARG_ITEM_ID, item.url)
                     }
                     supportFragmentManager.beginTransaction()
                             .replace(R.id.todo_detail_container, fragment)
@@ -84,7 +85,7 @@ class ToDoListActivity : AppCompatActivity() {
                 } else {
                     val context = v.context
                     val intent = Intent(context, ToDoDetailActivity::class.java)
-                    intent.putExtra(ToDoDetailFragment.ARG_ITEM_ID, item.id)
+                    intent.putExtra(ToDoDetailFragment.ARG_ITEM_ID, item.url)
                     context.startActivity(intent)
                 }
             }

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import net.xaethos.todofrontend.datasource.ToDoData
 import net.xaethos.todofrontend.dummy.DummyContent
 
 /**
@@ -20,7 +21,7 @@ class ToDoDetailFragment : Fragment() {
     /**
      * The dummy content this fragment is presenting.
      */
-    private var item: DummyContent.DummyItem? = null
+    private var item: ToDoData? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +33,7 @@ class ToDoDetailFragment : Fragment() {
             val item = DummyContent.ITEM_MAP[arguments.getString(ARG_ITEM_ID)]
 
             val appBarLayout = activity.findViewById(R.id.toolbar_layout) as CollapsingToolbarLayout?
-            appBarLayout?.title = item?.content
+            appBarLayout?.title = item?.title
         }
     }
 
@@ -42,7 +43,7 @@ class ToDoDetailFragment : Fragment() {
 
         // Show the dummy content as text in a TextView.
         val detailView = rootView.findViewById(R.id.todo_detail) as TextView
-        detailView.text = item?.details
+        detailView.text = item?.text
 
         return rootView
     }

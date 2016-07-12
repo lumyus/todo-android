@@ -1,5 +1,6 @@
 package net.xaethos.todofrontend.dummy
 
+import net.xaethos.todofrontend.datasource.ToDoData
 import java.util.*
 
 /**
@@ -15,46 +16,40 @@ object DummyContent {
     /**
      * An array of sample (dummy) items.
      */
-    val ITEMS: List<DummyItem>
+    val ITEMS: List<ToDoData>
 
     /**
      * A map of sample (dummy) items, by ID.
      */
-    val ITEM_MAP: Map<String, DummyItem>
+    val ITEM_MAP: Map<String, ToDoData>
 
     init {
-        val list = ArrayList<DummyItem>(COUNT)
-        val map = HashMap<String, DummyItem>(COUNT)
+        val list = ArrayList<ToDoData>(COUNT)
+        val map = HashMap<String, ToDoData>(COUNT)
 
         // Add some sample items.
         for (i in 1..COUNT) {
             val item = createDummyItem(i)
             list.add(item)
-            map.put(item.id, item)
+            map.put(item.url, item)
         }
 
         ITEMS = list
         ITEM_MAP = map
     }
 
-    private fun createDummyItem(position: Int): DummyItem {
-        return DummyItem(position.toString(), "Item $position", makeDetails(position))
-    }
+    private fun createDummyItem(position: Int) =
+            ToDoData(url = "http://example.com/todo/$position",
+                    title = "To do $position",
+                    text = makeDetails(position))
 
     private fun makeDetails(position: Int): String {
         return with(StringBuilder()) {
-            append("Details about Item: ").append(position)
+            append("Details about To Do ").append(position)
             for (i in 0..position - 1) {
                 append("\nMore details information here.")
             }
             toString()
         }
-    }
-
-    /**
-     * A dummy item representing a piece of content.
-     */
-    class DummyItem(val id: String, val content: String, val details: String) {
-        override fun toString() = content
     }
 }
