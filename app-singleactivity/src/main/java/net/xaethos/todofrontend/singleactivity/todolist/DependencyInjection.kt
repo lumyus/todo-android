@@ -1,5 +1,6 @@
 package net.xaethos.todofrontend.singleactivity.todolist
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
@@ -16,4 +17,7 @@ interface ToDoListComponent {
 }
 
 @Module
-class ToDoListModule(@get:Provides @ToDoListScope val listPresenter: ToDoListMediator.ListPresenter)
+class ToDoListModule(
+        @get:Provides @ToDoListScope val context: Context,
+        @get:Provides @ToDoListScope val listPresenter: ToDoListMediator.ListPresenter
+)

@@ -2,6 +2,7 @@ package net.xaethos.todofrontend.singleactivity.todolist
 
 import net.xaethos.todofrontend.datasource.ToDoData
 import net.xaethos.todofrontend.datasource.ToDoDataSource
+import net.xaethos.todofrontend.singleactivity.util.Toaster
 import javax.inject.Inject
 
 /**
@@ -10,6 +11,7 @@ import javax.inject.Inject
 @ToDoListScope
 class ToDoListMediator @Inject constructor() {
     @Inject lateinit var dataSource: ToDoDataSource
+    @Inject lateinit var toaster: Toaster
 
     private val toDos: List<ToDoData>
         get() = dataSource.allItems
@@ -21,6 +23,10 @@ class ToDoListMediator @Inject constructor() {
         val toDo = toDos[position]
         presenter.titleText = toDo.title
         presenter.urlText = toDo.url
+    }
+
+    fun onItemPresenterClick(position: Int) {
+        toaster.short("Tapped ${toDos[position].title}!")
     }
 
     interface ListPresenter

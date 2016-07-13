@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.bluelinelabs.conductor.rxlifecycle.RxController
+import dagger.MembersInjector
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.singletonComponent
 import net.xaethos.todofrontend.singleactivity.util.bindView
@@ -26,7 +27,8 @@ class ToDoListController : RxController(), ToDoListMediator.ListPresenter {
 
     override fun onAttach(view: View) {
         super.onAttach(view)
-        singletonComponent.toDoListComponent(ToDoListModule(this)).inject(this)
+        val module = ToDoListModule(activity, this)
+        singletonComponent.toDoListComponent(module).inject(this)
         listView.adapter = adapter
     }
 }
@@ -35,8 +37,14 @@ class ToDoListController : RxController(), ToDoListMediator.ListPresenter {
 class ToDoListAdapter @Inject constructor(private val mediator: ToDoListMediator) :
         RecyclerView.Adapter<ToDoItemViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-            ToDoItemViewHolder(LayoutInflater.from(parent.context), parent)
+    @Inject lateinit var holderInjector: MembersInjector<ToDoItemViewHolder>
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToDoItemViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val holder = ToDoItemViewHolder(inflater.inflate(R.layout.todo_list_content, parent, false))
+        holderInjector.injectMembers(holder)
+        return holder
+    }
 
     override fun onBindViewHolder(holder: ToDoItemViewHolder, position: Int) =
             mediator.onBindItemPresenter(holder, position)
@@ -44,15 +52,20 @@ class ToDoListAdapter @Inject constructor(private val mediator: ToDoListMediator
     override fun getItemCount() = mediator.itemCount
 }
 
-class ToDoItemViewHolder(view: View) : RecyclerView.ViewHolder(view), ToDoListMediator.ItemPresenter {
+class ToDoItemViewHolder(view: View) : RecyclerView.ViewHolder(view), ToDoListMediator.ItemPresenter, View.OnClickListener {
+    @Inject lateinit var mediator: ToDoListMediator
+
     private val idView: TextView by bindView(R.id.id)
     private val contentView: TextView by bindView(R.id.content)
 
     override var urlText by textViewText(idView)
     override var titleText by textViewText(contentView)
 
-    constructor(inflater: LayoutInflater, parent: ViewGroup) :
-    this(inflater.inflate(R.layout.todo_list_content, parent, false))
+    init {
+        view.setOnClickListener(this)
+    }
 
-    override fun toString() = super.toString() + " '" + contentView.text + "'"
+    override fun onClick(v: View?) {
+        mediator.onItemPresenterClick(adapterPosition)
+    }
 }
