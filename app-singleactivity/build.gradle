@@ -45,6 +45,12 @@ dependencies {
     compile 'com.bluelinelabs:conductor:2.0.0'
     compile 'com.bluelinelabs:conductor-rxlifecycle:2.0.0'
 
+    // Rx
+    compile 'io.reactivex:rxjava:1.1.7'
+    compile 'io.reactivex:rxkotlin:0.60.0'
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'com.jakewharton.rxbinding:rxbinding-kotlin:0.4.0'
+
     testCompile "org.jetbrains.kotlin:kotlin-test:$dep.kotlin"
 
     testCompile "junit:junit:$dep.junit"

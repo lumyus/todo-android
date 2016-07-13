@@ -18,6 +18,5 @@ interface ToDoListComponent {
 
 @Module
 class ToDoListModule(
-        @get:Provides @ToDoListScope val context: Context,
-        @get:Provides @ToDoListScope val listPresenter: ToDoListMediator.ListPresenter
+        @get:Provides @ToDoListScope val context: Context
 )
