@@ -7,6 +7,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
+import rx.lang.kotlin.emptyObservable
 import kotlin.test.assertEquals
 
 class ToDoListMediatorTest {
@@ -31,7 +32,9 @@ class ToDoListMediatorTest {
 
     @Test
     fun onBindItemPresenter() {
-        val presenter: ToDoListMediator.ItemPresenter = mock()
+        val presenter: ToDoListMediator.ItemPresenter = mock {
+            `when`(clicks).thenReturn(emptyObservable())
+        }
 
         mediator.onBindItemPresenter(presenter, 1)
 

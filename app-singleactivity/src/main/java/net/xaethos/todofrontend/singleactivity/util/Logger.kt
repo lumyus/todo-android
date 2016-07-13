@@ -10,8 +10,10 @@ class Logger(val tag: String) {
     @Inject constructor() : this("XAE")
 
     fun warn(throwable: Throwable) {
-        if (Log.isLoggable(tag, Log.WARN)) {
-            Log.w(tag, throwable.message)
-        }
+        Log.w(tag, throwable.message)
+    }
+
+    fun d(message: String) {
+        Log.d(tag, message)
     }
 }
