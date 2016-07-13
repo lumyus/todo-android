@@ -1,4 +1,4 @@
-package net.xaethos.todofrontend.singleactivity
+package net.xaethos.todofrontend.singleactivity.todolist
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -6,35 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.bluelinelabs.conductor.rxlifecycle.RxController
-import dagger.Module
-import dagger.Provides
-import dagger.Subcomponent
+import net.xaethos.todofrontend.singleactivity.R
+import net.xaethos.todofrontend.singleactivity.singletonComponent
 import net.xaethos.todofrontend.singleactivity.util.bindView
 import net.xaethos.todofrontend.singleactivity.util.textViewText
 import javax.inject.Inject
-import javax.inject.Scope
-
-@Scope
-@Retention(AnnotationRetention.RUNTIME)
-annotation class ToDoListScope
-
-@ToDoListScope
-@Subcomponent(modules = arrayOf(ToDoListModule::class))
-interface ToDoListComponent {
-    fun inject(controller: ToDoListController)
-}
-
-@Module
-class ToDoListModule(toDoListController: ToDoListController) {
-    @get:Provides @ToDoListScope val listPresenter: ToDoListMediator.ListPresenter = toDoListController
-}
 
 /**
  * View presenter: UI controls and events
  */
 class ToDoListController : RxController(), ToDoListMediator.ListPresenter {
 
-    @Inject lateinit var mediator: ToDoListMediator
     @Inject lateinit var adapter: ToDoListAdapter
 
     private val listView: RecyclerView by bindView(R.id.todo_list)

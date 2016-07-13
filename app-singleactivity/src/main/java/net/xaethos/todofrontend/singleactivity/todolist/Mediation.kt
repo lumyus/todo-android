@@ -1,4 +1,4 @@
-package net.xaethos.todofrontend.singleactivity
+package net.xaethos.todofrontend.singleactivity.todolist
 
 import net.xaethos.todofrontend.datasource.ToDoData
 import net.xaethos.todofrontend.datasource.ToDoDataSource
