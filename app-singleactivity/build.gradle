@@ -11,6 +11,8 @@ android {
         targetSdkVersion dep.targetSdk
         versionCode 1
         versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -56,4 +58,18 @@ dependencies {
     testCompile "junit:junit:$dep.junit"
 
     testCompile "org.mockito:mockito-core:1.10.19"
+
+    // Instrumentation
+    androidTestCompile("com.android.support:appcompat-v7:$dep.support",
+            "com.android.support:support-v4:$dep.support",
+            "com.android.support:recyclerview-v7:$dep.support",
+            "com.android.support:design:$dep.support")
+    androidTestCompile "com.android.support:support-annotations:$dep.support"
+    androidTestCompile "com.android.support.test:runner:$dep.supportTest"
+    androidTestCompile "com.android.support.test:rules:$dep.supportTest"
+    androidTestCompile "com.android.support.test.espresso:espresso-core:$dep.espresso"
+    androidTestCompile "com.android.support.test.espresso:espresso-contrib:$dep.espresso"
+    androidTestCompile "com.android.support.test.espresso:espresso-idling-resource:$dep.espresso"
+
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
 }
