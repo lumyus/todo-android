@@ -11,6 +11,7 @@ import javax.inject.Singleton
 
 @Scope @Retention(AnnotationRetention.RUNTIME) annotation class ActivityScope
 @Scope @Retention(AnnotationRetention.RUNTIME) annotation class ToDoListScope
+@Scope @Retention(AnnotationRetention.RUNTIME) annotation class ToDoItemScope
 
 @Module
 class ActivityModule(private val activity: Activity) {
