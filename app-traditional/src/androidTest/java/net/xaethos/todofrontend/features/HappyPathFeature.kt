@@ -25,11 +25,11 @@ class HappyPathFeature {
     @Test fun seeToDoDetails() {
         // Scroll down list and tap on to do
         onView(withId(R.id.todo_list))
-                .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(20))
-        onView(withText("To do 17")).perform(click())
+                .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(1))
+        onView(withText("Do stuff")).perform(click())
 
         // Check that the details are shown.
-        onView(withText(containsString("Details about To Do 17"))).check(matches(isDisplayed()))
+        onView(withText(containsString("I have stuff to do"))).check(matches(isDisplayed()))
     }
 
 }

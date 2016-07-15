@@ -50,7 +50,7 @@ class ToDoDetailFragment : Fragment() {
 
         // Show the dummy content as text in a TextView.
         val detailView = rootView.findViewById(R.id.todo_detail) as TextView
-        detailView.text = item?.text
+        detailView.text = item?.details
 
         return rootView
     }

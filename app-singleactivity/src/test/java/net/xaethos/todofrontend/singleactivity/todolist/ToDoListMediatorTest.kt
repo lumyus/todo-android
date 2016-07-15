@@ -20,7 +20,7 @@ class ToDoListMediatorTest {
     )
 
     val dataSource: ToDoDataSource = mock {
-        `when`(allItems).thenReturn(data)
+        `when`(all).thenReturn(data)
     }
 
     val mediator = ToDoListMediator()

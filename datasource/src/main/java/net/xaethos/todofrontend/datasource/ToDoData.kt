@@ -1,8 +1,7 @@
 package net.xaethos.todofrontend.datasource
 
 data class ToDoData(
-        val url: String,
+        val uri: String,
         val title: String,
-        val text: String? = null,
-        val completed: Boolean = false,
-        val order: Int = 0)
+        val details: String? = null,
+        val completed: Boolean = false)

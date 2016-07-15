@@ -19,7 +19,7 @@ class ToDoListMediator @Inject constructor() {
     @Inject lateinit var toaster: Toaster
 
     private val toDos: List<ToDoData>
-        get() = dataSource.allItems
+        get() = dataSource.all
 
     val itemCount: Int
         get() = toDos.size
@@ -30,7 +30,7 @@ class ToDoListMediator @Inject constructor() {
 
         // We now set the state of the presenter to reflect its position
         presenter.titleText = toDo.title
-        presenter.urlText = toDo.url
+        presenter.urlText = toDo.uri
 
         // Finally, we subscribe to UI events
         presenter.clicks.subscribeWith {

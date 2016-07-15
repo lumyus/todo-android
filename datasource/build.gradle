@@ -33,4 +33,6 @@ dependencies {
     compile "com.google.dagger:dagger:$dep.dagger"
 
     testCompile "junit:junit:$dep.junit"
+
+    testCompile "org.jetbrains.kotlin:kotlin-test:$dep.kotlin"
 }

@@ -62,7 +62,7 @@ class ToDoListActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(dataSource.allItems)
+        recyclerView.adapter = SimpleItemRecyclerViewAdapter(dataSource.all)
     }
 
     inner class SimpleItemRecyclerViewAdapter(private val values: List<ToDoData>) :
@@ -75,14 +75,14 @@ class ToDoListActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
-            holder.idView.text = item.url
+            holder.idView.text = item.uri
             holder.contentView.text = item.title
 
             holder.itemView.setOnClickListener { v ->
                 if (twoPane) {
                     val fragment = ToDoDetailFragment()
                     fragment.arguments = Bundle().apply {
-                        putString(ToDoDetailFragment.ARG_ITEM_ID, item.url)
+                        putString(ToDoDetailFragment.ARG_ITEM_ID, item.uri)
                     }
                     supportFragmentManager.beginTransaction()
                             .replace(R.id.todo_detail_container, fragment)
@@ -90,7 +90,7 @@ class ToDoListActivity : AppCompatActivity() {
                 } else {
                     val context = v.context
                     val intent = Intent(context, ToDoDetailActivity::class.java)
-                    intent.putExtra(ToDoDetailFragment.ARG_ITEM_ID, item.url)
+                    intent.putExtra(ToDoDetailFragment.ARG_ITEM_ID, item.uri)
                     context.startActivity(intent)
                 }
             }

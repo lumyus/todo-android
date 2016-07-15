@@ -11,3 +11,5 @@ interface SingletonComponent {
 
     fun inject(fragment: ToDoDetailFragment)
 }
+
+val singletonComponent: SingletonComponent = DaggerSingletonComponent.create()
