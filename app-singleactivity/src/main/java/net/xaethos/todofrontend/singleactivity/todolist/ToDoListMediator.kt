@@ -13,7 +13,7 @@ import javax.inject.Inject
  * Mediator: All business logic goes here
  */
 @CollectionScope
-class ToDoListMediator @Inject constructor() {
+class ToDoListMediator @Inject constructor(val navigator: Navigator) {
     @Inject lateinit var dataSource: ToDoDataSource
     @Inject lateinit var logger: Logger
     @Inject lateinit var toaster: Toaster
@@ -34,9 +34,20 @@ class ToDoListMediator @Inject constructor() {
 
         // Finally, we subscribe to UI events
         presenter.clicks.subscribeWith {
-            onNext { toaster.short("Tapped on '${toDo.title}'!") }
+            onNext { navigator.pushDetailController(toDo) }
             onError { logger.warn(it) }
         }
+    }
+
+    /*
+    The navigator interfaces are how the mediator requests for a change in the app flow.
+    It'll almost certainly be implemented by a Controller, since it has access to the router,
+    but the exact way the flow changes may be different depending on the current app configuration.
+    i.e. a phone may push a new controller on top, while a tablet may place it on a detail
+    view.
+     */
+    interface Navigator {
+        fun pushDetailController(toDo: ToDoData)
     }
 
     /*

@@ -8,12 +8,16 @@ import android.widget.TextView
 import com.bluelinelabs.conductor.Controller
 import com.jakewharton.rxbinding.view.clicks
 import com.jakewharton.rxbinding.view.detaches
+import dagger.Provides
 import dagger.Subcomponent
+import net.xaethos.todofrontend.datasource.ToDoData
 import net.xaethos.todofrontend.singleactivity.CollectionScope
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.component
+import net.xaethos.todofrontend.singleactivity.tododetail.ToDoDetailController
 import net.xaethos.todofrontend.singleactivity.util.ControllerViewHolder
 import net.xaethos.todofrontend.singleactivity.util.bindView
+import net.xaethos.todofrontend.singleactivity.util.routerTransaction
 import net.xaethos.todofrontend.singleactivity.util.textViewText
 import rx.Observable
 import javax.inject.Inject
@@ -21,11 +25,12 @@ import javax.inject.Inject
 /**
  * View presenter: UI controls and events
  */
-class ToDoListController() : Controller() {
-
+class ToDoListController() : Controller(), ToDoListMediator.Navigator {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         val viewHolder = ViewHolder(inflater.inflate(R.layout.todo_list, container, false))
-        val viewComponent = activity.component.toDoListComponentBuilder().build()
+        val viewComponent = activity.component.toDoListComponentBuilder()
+                .controllerModule(Module())
+                .build()
 
         return viewComponent.inject(viewHolder).root
     }
@@ -43,18 +48,28 @@ class ToDoListController() : Controller() {
         }
     }
 
+    override fun pushDetailController(toDo: ToDoData) {
+        router.pushController(ToDoDetailController(toDo.uri).routerTransaction())
+    }
+
     /*
     This is the component for this controller's view. Its lifecycle should match the _view's_
     lifecycle. This means we should create a new ViewComponent on each onCreateView
      */
-    @CollectionScope @Subcomponent
+    @CollectionScope @Subcomponent(modules = arrayOf(Module::class))
     interface ViewComponent {
         fun inject(viewHolder: ViewHolder): ViewHolder
 
         @Subcomponent.Builder
         interface Builder {
             fun build(): ViewComponent
+            fun controllerModule(module: Module): Builder
         }
+    }
+
+    @dagger.Module
+    inner class Module() {
+        @Provides @CollectionScope fun navigator(): ToDoListMediator.Navigator = this@ToDoListController
     }
 }
 
