@@ -9,8 +9,8 @@ import com.bluelinelabs.conductor.Controller
 import com.jakewharton.rxbinding.view.clicks
 import com.jakewharton.rxbinding.view.detaches
 import dagger.Subcomponent
+import net.xaethos.todofrontend.singleactivity.CollectionScope
 import net.xaethos.todofrontend.singleactivity.R
-import net.xaethos.todofrontend.singleactivity.ToDoListScope
 import net.xaethos.todofrontend.singleactivity.component
 import net.xaethos.todofrontend.singleactivity.util.ControllerViewHolder
 import net.xaethos.todofrontend.singleactivity.util.bindView
@@ -47,7 +47,7 @@ class ToDoListController() : Controller() {
     This is the component for this controller's view. Its lifecycle should match the _view's_
     lifecycle. This means we should create a new ViewComponent on each onCreateView
      */
-    @ToDoListScope @Subcomponent
+    @CollectionScope @Subcomponent
     interface ViewComponent {
         fun inject(viewHolder: ViewHolder): ViewHolder
 
@@ -58,7 +58,7 @@ class ToDoListController() : Controller() {
     }
 }
 
-@ToDoListScope
+@CollectionScope
 class ToDoListAdapter @Inject constructor(private val mediator: ToDoListMediator) :
         RecyclerView.Adapter<ToDoListAdapter.ViewHolder>() {
 

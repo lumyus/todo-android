@@ -10,8 +10,8 @@ import javax.inject.Scope
 import javax.inject.Singleton
 
 @Scope @Retention(AnnotationRetention.RUNTIME) annotation class ActivityScope
-@Scope @Retention(AnnotationRetention.RUNTIME) annotation class ToDoListScope
-@Scope @Retention(AnnotationRetention.RUNTIME) annotation class ToDoItemScope
+@Scope @Retention(AnnotationRetention.RUNTIME) annotation class CollectionScope
+@Scope @Retention(AnnotationRetention.RUNTIME) annotation class ItemScope
 
 @Module
 class ActivityModule(private val activity: Activity) {

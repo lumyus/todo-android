@@ -2,7 +2,7 @@ package net.xaethos.todofrontend.singleactivity.todolist
 
 import net.xaethos.todofrontend.datasource.ToDoData
 import net.xaethos.todofrontend.datasource.ToDoDataSource
-import net.xaethos.todofrontend.singleactivity.ToDoListScope
+import net.xaethos.todofrontend.singleactivity.CollectionScope
 import net.xaethos.todofrontend.singleactivity.util.Logger
 import net.xaethos.todofrontend.singleactivity.util.Toaster
 import rx.Observable
@@ -12,7 +12,7 @@ import javax.inject.Inject
 /**
  * Mediator: All business logic goes here
  */
-@ToDoListScope
+@CollectionScope
 class ToDoListMediator @Inject constructor() {
     @Inject lateinit var dataSource: ToDoDataSource
     @Inject lateinit var logger: Logger

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Router
 import dagger.Subcomponent
+import net.xaethos.todofrontend.singleactivity.tododetail.ToDoDetailController
 import net.xaethos.todofrontend.singleactivity.todolist.ToDoListController
 import net.xaethos.todofrontend.singleactivity.util.bindView
 import net.xaethos.todofrontend.singleactivity.util.routerTransaction
@@ -37,6 +38,7 @@ class SingleActivity : AppCompatActivity() {
     @ActivityScope @Subcomponent(modules = arrayOf(ActivityModule::class))
     interface Component {
         fun toDoListComponentBuilder(): ToDoListController.ViewComponent.Builder
+        fun toDoDetailComponentBuilder(): ToDoDetailController.ViewComponent.Builder
     }
 }
 
