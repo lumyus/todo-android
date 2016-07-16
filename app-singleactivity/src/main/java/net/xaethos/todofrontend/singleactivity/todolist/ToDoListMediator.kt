@@ -39,21 +39,20 @@ class ToDoListMediator @Inject constructor(val navigator: Navigator) {
         }
     }
 
-    /*
-    The navigator interfaces are how the mediator requests for a change in the app flow.
-    It'll almost certainly be implemented by a Controller, since it has access to the router,
-    but the exact way the flow changes may be different depending on the current app configuration.
-    i.e. a phone may push a new controller on top, while a tablet may place it on a detail
-    view.
+    /**
+     * The navigator interfaces are how the mediator requests for a change in the app flow.
+     * It'll almost certainly be implemented by a Controller, since it has access to the router,
+     * but the exact way the flow changes may be different depending on the current app
+     * configuration. i.e. a phone may push a new controller on top, while a tablet may place it on
+     * a detail view.
      */
     interface Navigator {
         fun pushDetailController(toDo: ToDoData)
     }
 
-    /*
-    The presenter interfaces are what the mediator needs to control and react
-    to the UI. The exact view structure is not important as long as these methods
-    are available.
+    /**
+     * The presenter interfaces are what the mediator needs to control and react to the UI. The
+     * exact view structure is not important as long as these methods are available.
      */
     interface ItemPresenter {
         /*

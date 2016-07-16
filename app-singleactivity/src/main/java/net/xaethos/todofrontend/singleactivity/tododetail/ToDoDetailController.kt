@@ -40,7 +40,7 @@ class ToDoDetailController(bundle: Bundle) : Controller(bundle) {
         var uri by stringDelegate
     }
 
-    class ViewHolder(override val root: View) : ControllerViewHolder, ToDoDetailMediator.Presenter {
+    class ViewHolder(override val root: View) : Presenter, ToDoDetailMediator.Presenter {
         @Inject lateinit var mediator: ToDoDetailMediator
 
         private val appBarLayout: CollapsingToolbarLayout by bindView(R.id.toolbar_layout)

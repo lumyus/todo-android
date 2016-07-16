@@ -33,8 +33,8 @@ fun <V : View> ViewHolder.bindView(id: Int)
 fun <V : View> Controller.bindView(id: Int)
         : ReadOnlyProperty<Controller, V> = required(id, viewFinder)
 
-fun <V : View> ControllerViewHolder.bindView(id: Int)
-        : ReadOnlyProperty<ControllerViewHolder, V> = required(id, viewFinder)
+fun <V : View> Presenter.bindView(id: Int)
+        : ReadOnlyProperty<Presenter, V> = required(id, viewFinder)
 
 fun <V : View> View.bindOptionalView(id: Int)
         : ReadOnlyProperty<View, V?> = optional(id, viewFinder)
@@ -104,7 +104,7 @@ private val ViewHolder.viewFinder: ViewHolder.(Int) -> View?
     get() = { itemView.findViewById(it) }
 private val Controller.viewFinder: Controller.(Int) -> View?
     get() = { view.findViewById(it) }
-private val ControllerViewHolder.viewFinder: ControllerViewHolder.(Int) -> View?
+private val Presenter.viewFinder: Presenter.(Int) -> View?
     get() = { root.findViewById(it) }
 
 private fun viewNotFound(id: Int, desc: KProperty<*>): Nothing =
