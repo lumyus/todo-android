@@ -13,30 +13,31 @@ import dagger.Subcomponent
 import net.xaethos.todofrontend.singleactivity.ItemScope
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.component
-import net.xaethos.todofrontend.singleactivity.util.ControllerViewHolder
-import net.xaethos.todofrontend.singleactivity.util.bindView
-import net.xaethos.todofrontend.singleactivity.util.stringProperty
-import net.xaethos.todofrontend.singleactivity.util.textViewText
+import net.xaethos.todofrontend.singleactivity.util.*
 import javax.inject.Inject
 
 /**
  * View presenter: UI controls and events
  */
-class ToDoDetailController(args: Bundle) : Controller(args) {
+class ToDoDetailController(bundle: Bundle) : Controller(bundle) {
 
-    val uri by args.stringProperty()
-
-    constructor(uri: String) : this(Bundle().apply {
-        putString("uri", uri)
+    constructor(uri: String) : this(bundleData(::Arguments) {
+        this.uri = uri
     })
+
+    val args = Arguments(bundle)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         val viewHolder = ViewHolder(inflater.inflate(R.layout.todo_detail, container, false))
         val viewComponent = activity.component.toDoDetailComponentBuilder()
-                .controllerModule(Module(viewHolder, uri!!))
+                .controllerModule(Module(viewHolder, args.uri!!))
                 .build()
 
         return viewComponent.inject(viewHolder).root
+    }
+
+    class Arguments(bundle: Bundle) : DataBundle(bundle) {
+        var uri by stringDelegate
     }
 
     class ViewHolder(override val root: View) : ControllerViewHolder, ToDoDetailMediator.Presenter {
