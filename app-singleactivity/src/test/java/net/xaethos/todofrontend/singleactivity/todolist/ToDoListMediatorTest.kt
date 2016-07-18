@@ -7,7 +7,9 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
+import rx.Observable
 import rx.lang.kotlin.emptyObservable
+import rx.lang.kotlin.toSingletonObservable
 import kotlin.test.assertEquals
 
 class ToDoListMediatorTest {
@@ -19,11 +21,12 @@ class ToDoListMediatorTest {
             todo(3)
     )
 
+    val navigator: ToDoListMediator.Navigator = mock()
     val dataSource: ToDoDataSource = mock {
         `when`(all).thenReturn(data)
     }
 
-    val mediator = ToDoListMediator()
+    val mediator = ToDoListMediator(navigator)
 
     @Before
     fun setUp() {
@@ -34,12 +37,25 @@ class ToDoListMediatorTest {
     fun onBindItemPresenter() {
         val presenter: ToDoListMediator.ItemPresenter = mock {
             `when`(clicks).thenReturn(emptyObservable())
+            `when`(unbinds).thenReturn(Observable.never())
         }
 
-        mediator.onBindItemPresenter(presenter, 1)
+        mediator.bindItemPresenter(presenter, 1)
 
         verify(presenter).titleText = "To Do 1"
         verify(presenter).urlText = "http://example.com/todo/1"
+    }
+
+    @Test
+    fun onItemClick_showDetails() {
+        val presenter: ToDoListMediator.ItemPresenter = mock {
+            `when`(clicks).thenReturn(Unit.toSingletonObservable())
+            `when`(unbinds).thenReturn(Observable.never())
+        }
+
+        mediator.bindItemPresenter(presenter, 2)
+
+        verify(navigator).pushDetailController(data[2])
     }
 
     @Test

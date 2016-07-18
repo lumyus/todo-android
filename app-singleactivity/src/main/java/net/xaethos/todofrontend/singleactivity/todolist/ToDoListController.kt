@@ -4,86 +4,94 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import com.bluelinelabs.conductor.Controller
-import com.jakewharton.rxbinding.view.clicks
-import com.jakewharton.rxbinding.view.detaches
+import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
+import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler
+import com.bluelinelabs.conductor.rxlifecycle.RxController
+import dagger.MembersInjector
+import dagger.Provides
 import dagger.Subcomponent
+import net.xaethos.todofrontend.datasource.ToDoData
+import net.xaethos.todofrontend.singleactivity.CollectionScope
 import net.xaethos.todofrontend.singleactivity.R
-import net.xaethos.todofrontend.singleactivity.ToDoListScope
 import net.xaethos.todofrontend.singleactivity.component
-import net.xaethos.todofrontend.singleactivity.util.ControllerViewHolder
-import net.xaethos.todofrontend.singleactivity.util.bindView
-import net.xaethos.todofrontend.singleactivity.util.textViewText
-import rx.Observable
+import net.xaethos.todofrontend.singleactivity.tododetail.ToDoDetailController
+import net.xaethos.todofrontend.singleactivity.util.RxControllerModule
+import net.xaethos.todofrontend.singleactivity.util.routerTransaction
 import javax.inject.Inject
 
 /**
- * View presenter: UI controls and events
+ * A controller for displaying a list of to do items.
+ *
+ * Controllers live on nodes in the view hierarchy. They are akin to fragments, but with a
+ * simpler lifecycle. They will instantiate mediators and presenters to do the actual view
+ * manipulation.
+ *
+ * While presenters manipulate views, controllers choose what type of view and presenter
+ * will be used. Controllers are also in charge of navigation, pushing and popping new
+ * controllers onto the router as the mediator requests.
+ *
+ * Finally, controllers handle dependency injection for mediators and presenters.
  */
-class ToDoListController() : Controller() {
-
+class ToDoListController() : RxController(), ToDoListMediator.Navigator {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
-        val viewHolder = ViewHolder(inflater.inflate(R.layout.todo_list, container, false))
-        val viewComponent = activity.component.toDoListComponentBuilder().build()
+        val viewComponent = createViewComponent()
+        val view = inflater.inflate(R.layout.presenter_todo_list, container, false)
+        val presenter = viewComponent.inject(ToDoListPresenter(view))
 
-        return viewComponent.inject(viewHolder).root
+        return presenter.root
     }
 
-    /*
-    We keep our bound views together in a separate class, so we can drop all the
-    references at once. If we were to use [bindView] directly on the controller,
-    a second call to [onCreateView] wouldn't reinitialize the bindings.
-     */
-    class ViewHolder(override val root: View) : ControllerViewHolder {
-        val listView: RecyclerView by bindView<RecyclerView>(R.id.todo_list)
+    override fun pushDetailController(toDo: ToDoData) =
+            router.pushController(ToDoDetailController.create(toDo.uri).routerTransaction()
+                    .pushChangeHandler(VerticalChangeHandler())
+                    .popChangeHandler(FadeChangeHandler()))
 
-        @Inject fun setUp(adapter: ToDoListAdapter) {
-            listView.adapter = adapter
+    private fun createViewComponent() = activity.component.toDoListComponentBuilder()
+            .controllerModule(Module())
+            .build()
+
+    @CollectionScope
+    class Adapter @Inject constructor(
+            private val mediator: ToDoListMediator,
+            private var viewHolderInjector: MembersInjector<ToDoListPresenter.ItemHolder>
+    ) : RecyclerView.Adapter<ToDoListPresenter.ItemHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup,
+                                        viewType: Int): ToDoListPresenter.ItemHolder {
+            val inflater = LayoutInflater.from(parent.context)
+            val view = inflater.inflate(R.layout.presenter_todo_list_item, parent, false)
+            val viewHolder = ToDoListPresenter.ItemHolder(view)
+            viewHolderInjector.injectMembers(viewHolder)
+            return viewHolder
         }
+
+        override fun onBindViewHolder(holder: ToDoListPresenter.ItemHolder, position: Int) =
+                mediator.bindItemPresenter(holder, position)
+
+        override fun onViewRecycled(holder: ToDoListPresenter.ItemHolder) = holder.onRecycle()
+
+        override fun getItemCount() = mediator.itemCount
     }
 
-    /*
-    This is the component for this controller's view. Its lifecycle should match the _view's_
-    lifecycle. This means we should create a new ViewComponent on each onCreateView
+    /**
+     * The Dagger component providing dependencies for this controller's views.
+     *
+     * Its lifecycle should match the _view's_ lifecycle: we should create a new
+     * `ViewComponent` instance on each `onCreateView`.
      */
-    @ToDoListScope @Subcomponent
+    @CollectionScope @Subcomponent(modules = arrayOf(Module::class))
     interface ViewComponent {
-        fun inject(viewHolder: ViewHolder): ViewHolder
+        fun inject(presenter: ToDoListPresenter): ToDoListPresenter
 
         @Subcomponent.Builder
         interface Builder {
             fun build(): ViewComponent
+            fun controllerModule(module: Module): Builder
         }
     }
-}
 
-@ToDoListScope
-class ToDoListAdapter @Inject constructor(private val mediator: ToDoListMediator) :
-        RecyclerView.Adapter<ToDoListAdapter.ViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return ViewHolder(inflater.inflate(R.layout.todo_list_content, parent, false))
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) =
-            mediator.onBindItemPresenter(holder, position)
-
-    override fun getItemCount() = mediator.itemCount
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view), ToDoListMediator.ItemPresenter {
-        private val idView: TextView by bindView(R.id.id)
-        private val contentView: TextView by bindView(R.id.content)
-
-        override var urlText by textViewText(idView)
-        override var titleText by textViewText(contentView)
-
-        /*
-        Since the lifecycle of a single list item is much shorter than that
-        of its container, lets make sure we only emit events until this
-        view has been detached.
-         */
-        override val clicks: Observable<Unit> = view.clicks().takeUntil(view.detaches())
+    @dagger.Module
+    inner class Module : RxControllerModule(this) {
+        @Provides fun navigator(): ToDoListMediator.Navigator = this@ToDoListController
     }
 }
