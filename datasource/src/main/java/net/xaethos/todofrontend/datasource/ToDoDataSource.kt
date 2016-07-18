@@ -49,6 +49,7 @@ internal class LocalSource : ToDoDataSource {
         insertItemUnsafe(ToDoData("todo/0", "Write To Do app", completed = true))
         insertItemUnsafe(ToDoData("todo/1", "Give a talk on To Do app"))
         insertItemUnsafe(ToDoData("todo/2", "Do stuff", details = "I have stuff to do"))
+        (3..30).forEach { insertItemUnsafe(ToDoData("todo/$it", "to do $it")) }
     }
 
     override fun get(index: Int) = all[index]

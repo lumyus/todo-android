@@ -13,14 +13,15 @@ import javax.inject.Singleton
 @Scope @Retention(AnnotationRetention.RUNTIME) annotation class CollectionScope
 @Scope @Retention(AnnotationRetention.RUNTIME) annotation class ItemScope
 
+@Singleton @Component(modules = arrayOf(DataModule::class))
+interface SingletonComponent {
+    fun activityComponent(module: ActivityModule): SingleActivity.Component
+
+}
+
+val singletonComponent: SingletonComponent = DaggerSingletonComponent.create()
+
 @Module
 class ActivityModule(private val activity: Activity) {
     @Provides @ActivityScope fun context(): Context = activity
 }
-
-@Singleton @Component(modules = arrayOf(DataModule::class))
-interface SingletonComponent {
-    fun activityComponent(module: ActivityModule): SingleActivity.Component
-}
-
-val singletonComponent: SingletonComponent = DaggerSingletonComponent.create()

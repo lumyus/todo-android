@@ -13,23 +13,12 @@ class ToDoDetailMediatorTest {
     @Test
     fun fetchData() {
         val presenter = mock<ToDoDetailMediator.Presenter>()
-        val mediator = ToDoDetailMediator(presenter, uri)
+        val mediator = ToDoDetailMediator()
         mediator.dataSource = mock {
             `when`(get(uri)).thenReturn(toDo)
         }
 
-        mediator.fetchData()
-
-        verify(presenter).titleText = "Title"
-        verify(presenter).detailsText = "Details"
-    }
-
-    @Test
-    fun bindPresenter() {
-        val presenter = mock<ToDoDetailMediator.Presenter>()
-        val mediator = ToDoDetailMediator(presenter, uri)
-
-        mediator.bindPresenter(toDo)
+        mediator.bindPresenter(presenter, uri)
 
         verify(presenter).titleText = "Title"
         verify(presenter).detailsText = "Details"

@@ -1,23 +1,18 @@
 package net.xaethos.todofrontend.singleactivity.tododetail
 
-import net.xaethos.todofrontend.datasource.ToDoData
 import net.xaethos.todofrontend.datasource.ToDoDataSource
 import net.xaethos.todofrontend.singleactivity.ItemScope
 import javax.inject.Inject
 
 /**
- * Mediator: All business logic goes here
+ * Mediator: uses business logic to binding data to views
  */
 @ItemScope
-class ToDoDetailMediator @Inject constructor(val presenter: Presenter, val uri: String) {
+class ToDoDetailMediator @Inject constructor() {
     @Inject lateinit var dataSource: ToDoDataSource
 
-    @Inject
-    fun fetchData() {
-        bindPresenter(dataSource[uri])
-    }
-
-    fun bindPresenter(toDo: ToDoData?) {
+    fun bindPresenter(presenter: Presenter, uri: String) {
+        val toDo = dataSource[uri]
         presenter.titleText = toDo?.title
         presenter.detailsText = toDo?.details
     }

@@ -6,7 +6,7 @@ import kotlin.reflect.KProperty
 
 abstract class DataBundle(val bundle: Bundle) {
     companion object {
-        val stringDelegate = object : ReadWriteProperty<DataBundle, String?> {
+        val bundleString = object : ReadWriteProperty<DataBundle, String?> {
             override fun getValue(thisRef: DataBundle, property: KProperty<*>): String? {
                 return thisRef.bundle.getString(property.name)
             }
@@ -16,11 +16,4 @@ abstract class DataBundle(val bundle: Bundle) {
             }
         }
     }
-}
-
-fun <T : DataBundle> bundleData(construct: (Bundle) -> T,
-                                initialize: T.() -> Unit): Bundle {
-    val dataBundle = construct(Bundle())
-    dataBundle.initialize()
-    return dataBundle.bundle
 }
