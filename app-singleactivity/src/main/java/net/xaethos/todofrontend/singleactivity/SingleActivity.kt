@@ -1,11 +1,13 @@
 package net.xaethos.todofrontend.singleactivity
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Router
+import dagger.Provides
 import dagger.Subcomponent
 import net.xaethos.todofrontend.singleactivity.tododetail.ToDoDetailController
 import net.xaethos.todofrontend.singleactivity.todolist.ToDoListController
@@ -23,7 +25,7 @@ class SingleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_single)
 
-        component = singletonComponent.activityComponent(ActivityModule(this))
+        component = singletonComponent.activityComponent(Module())
 
         router = Conductor.attachRouter(this, container, savedInstanceState)
         if (!router.hasRootController()) {
@@ -35,10 +37,16 @@ class SingleActivity : AppCompatActivity() {
         if (!router.handleBack()) super.onBackPressed()
     }
 
-    @ActivityScope @Subcomponent(modules = arrayOf(ActivityModule::class))
+    @ActivityScope @Subcomponent(modules = arrayOf(Module::class))
     interface Component {
         fun toDoListComponentBuilder(): ToDoListController.ViewComponent.Builder
         fun toDoDetailComponentBuilder(): ToDoDetailController.ViewComponent.Builder
+    }
+
+    @dagger.Module
+    inner class Module {
+        @Provides @ActivityScope fun context(): Context = this@SingleActivity
+        @Provides @ActivityScope fun activity(): SingleActivity = this@SingleActivity
     }
 }
 

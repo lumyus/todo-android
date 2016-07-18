@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
+import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler
 import com.bluelinelabs.conductor.rxlifecycle.RxController
 import dagger.MembersInjector
 import dagger.Provides
@@ -34,7 +35,7 @@ import javax.inject.Inject
 class ToDoListController() : RxController(), ToDoListMediator.Navigator {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         val viewComponent = createViewComponent()
-        val view = inflater.inflate(R.layout.todo_list, container, false)
+        val view = inflater.inflate(R.layout.presenter_todo_list, container, false)
         val presenter = viewComponent.inject(ToDoListPresenter(view))
 
         return presenter.root
@@ -42,7 +43,7 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
 
     override fun pushDetailController(toDo: ToDoData) =
             router.pushController(ToDoDetailController.create(toDo.uri).routerTransaction()
-                    .pushChangeHandler(FadeChangeHandler())
+                    .pushChangeHandler(VerticalChangeHandler())
                     .popChangeHandler(FadeChangeHandler()))
 
     private fun createViewComponent() = activity.component.toDoListComponentBuilder()
@@ -58,7 +59,7 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
         override fun onCreateViewHolder(parent: ViewGroup,
                                         viewType: Int): ToDoListPresenter.ItemHolder {
             val inflater = LayoutInflater.from(parent.context)
-            val view = inflater.inflate(R.layout.todo_list_content, parent, false)
+            val view = inflater.inflate(R.layout.presenter_todo_list_item, parent, false)
             val viewHolder = ToDoListPresenter.ItemHolder(view)
             viewHolderInjector.injectMembers(viewHolder)
             return viewHolder

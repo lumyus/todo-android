@@ -1,10 +1,12 @@
 package net.xaethos.todofrontend.singleactivity.todolist
 
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.TextView
 import com.jakewharton.rxbinding.view.clicks
 import net.xaethos.todofrontend.singleactivity.R
+import net.xaethos.todofrontend.singleactivity.SingleActivity
 import net.xaethos.todofrontend.singleactivity.util.Presenter
 import net.xaethos.todofrontend.singleactivity.util.ViewHolderPresenter
 import net.xaethos.todofrontend.singleactivity.util.bindView
@@ -25,11 +27,15 @@ import javax.inject.Inject
  * a second call to [Controller.onCreateView] wouldn't reinitialize the bindings.
  */
 class ToDoListPresenter(override val root: View) : Presenter {
-    val listView: RecyclerView by bindView<RecyclerView>(R.id.todo_list)
+    val toolbar by bindView<Toolbar>(R.id.toolbar)
+    val listView by bindView<RecyclerView>(R.id.todo_list)
 
     @Inject override lateinit var unbinds: Observable<Unit>
 
-    @Inject fun setUp(adapter: ToDoListController.Adapter) {
+    @Inject
+    fun setUp(activity: SingleActivity, adapter: ToDoListController.Adapter) {
+        activity.setSupportActionBar(toolbar)
+        toolbar.title = activity.title
         listView.adapter = adapter
     }
 

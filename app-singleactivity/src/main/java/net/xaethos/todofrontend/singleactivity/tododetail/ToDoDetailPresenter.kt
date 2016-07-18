@@ -5,6 +5,7 @@ import android.support.v7.widget.Toolbar
 import android.view.View
 import android.widget.TextView
 import net.xaethos.todofrontend.singleactivity.R
+import net.xaethos.todofrontend.singleactivity.SingleActivity
 import net.xaethos.todofrontend.singleactivity.util.Presenter
 import net.xaethos.todofrontend.singleactivity.util.bindView
 import net.xaethos.todofrontend.singleactivity.util.textViewText
@@ -28,4 +29,10 @@ class ToDoDetailPresenter(override val root: View) : Presenter, ToDoDetailMediat
     override var detailsText by textViewText(detailView)
 
     @Inject override lateinit var unbinds: Observable<Unit>
+
+    @Inject
+    fun setUp(activity: SingleActivity) {
+        activity.setSupportActionBar(toolbar)
+        activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
 }

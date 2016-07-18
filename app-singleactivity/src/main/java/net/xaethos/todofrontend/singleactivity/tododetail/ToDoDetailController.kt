@@ -2,6 +2,7 @@ package net.xaethos.todofrontend.singleactivity.tododetail
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import com.bluelinelabs.conductor.rxlifecycle.RxController
@@ -29,14 +30,26 @@ class ToDoDetailController(val args: Arguments) : RxController(args.bundle) {
         }
     }
 
+    init {
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         val viewComponent = createViewComponent()
-        val view = inflater.inflate(R.layout.todo_detail, container, false)
+        val view = inflater.inflate(R.layout.presenter_todo_detail, container, false)
         val presenter = viewComponent.inject(ToDoDetailPresenter(view))
         val mediator = viewComponent.mediator()
 
         mediator.bindPresenter(presenter, args.uri!!)
         return presenter.root
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> router.popCurrentController()
+            else -> return super.onOptionsItemSelected(item)
+        }
+        return true
     }
 
     private fun createViewComponent() = activity.component.toDoDetailComponentBuilder()
