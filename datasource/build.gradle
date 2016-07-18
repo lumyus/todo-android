@@ -32,7 +32,13 @@ dependencies {
     kapt "com.google.dagger:dagger-compiler:$dep.dagger"
     compile "com.google.dagger:dagger:$dep.dagger"
 
+    // Rx
+    compile "io.reactivex:rxjava:$dep.rxJava"
+    compile "io.reactivex:rxkotlin:$dep.rxKotlin"
+
     testCompile "junit:junit:$dep.junit"
 
     testCompile "org.jetbrains.kotlin:kotlin-test:$dep.kotlin"
+
+    testCompile 'com.natpryce:hamkrest:1.2.1.0'
 }
