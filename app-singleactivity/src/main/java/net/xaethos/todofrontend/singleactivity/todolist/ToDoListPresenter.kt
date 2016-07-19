@@ -26,18 +26,21 @@ import javax.inject.Inject
  * references at once. If we were to use [bindView] directly on the controller,
  * a second call to [Controller.onCreateView] wouldn't reinitialize the bindings.
  */
-class ToDoListPresenter(override val root: View) : Presenter {
+class ToDoListPresenter(override val root: View) : Presenter, ToDoListMediator.ListPresenter {
     val toolbar by bindView<Toolbar>(R.id.toolbar)
     val listView by bindView<RecyclerView>(R.id.todo_list)
 
+    @Inject lateinit var adapter: ToDoListController.Adapter
     @Inject override lateinit var unbinds: Observable<Unit>
 
     @Inject
-    fun setUp(activity: SingleActivity, adapter: ToDoListController.Adapter) {
+    fun setUp(activity: SingleActivity) {
         activity.setSupportActionBar(toolbar)
         toolbar.title = activity.title
         listView.adapter = adapter
     }
+
+    override fun notifyDataSetChanged() = adapter.notifyDataSetChanged()
 
     class ItemHolder(view: View) : ViewHolderPresenter(view), ToDoListMediator.ItemPresenter {
         private val idView: TextView by bindView(R.id.id)

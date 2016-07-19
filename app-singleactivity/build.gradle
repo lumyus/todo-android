@@ -54,6 +54,7 @@ dependencies {
     compile 'com.jakewharton.rxbinding:rxbinding-kotlin:0.4.0'
 
     testCompile "org.jetbrains.kotlin:kotlin-test:$dep.kotlin"
+    testCompile 'com.natpryce:hamkrest:1.2.1.0'
 
     testCompile "junit:junit:$dep.junit"
 

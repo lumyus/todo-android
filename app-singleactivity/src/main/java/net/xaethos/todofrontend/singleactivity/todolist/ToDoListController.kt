@@ -37,7 +37,9 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
         val viewComponent = createViewComponent()
         val view = inflater.inflate(R.layout.presenter_todo_list, container, false)
         val presenter = viewComponent.inject(ToDoListPresenter(view))
+        val mediator = viewComponent.mediator()
 
+        mediator.bindListPresenter(presenter)
         return presenter.root
     }
 
@@ -65,8 +67,9 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
             return viewHolder
         }
 
-        override fun onBindViewHolder(holder: ToDoListPresenter.ItemHolder, position: Int) =
-                mediator.bindItemPresenter(holder, position)
+        override fun onBindViewHolder(holder: ToDoListPresenter.ItemHolder, position: Int) {
+            mediator.bindItemPresenter(holder, position)
+        }
 
         override fun onViewRecycled(holder: ToDoListPresenter.ItemHolder) = holder.onRecycle()
 
@@ -82,6 +85,7 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
     @CollectionScope @Subcomponent(modules = arrayOf(Module::class))
     interface ViewComponent {
         fun inject(presenter: ToDoListPresenter): ToDoListPresenter
+        fun mediator(): ToDoListMediator
 
         @Subcomponent.Builder
         interface Builder {

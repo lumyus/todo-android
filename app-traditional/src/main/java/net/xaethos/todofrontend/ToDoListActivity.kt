@@ -62,11 +62,19 @@ class ToDoListActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(dataSource.all)
+        val adapter = SimpleItemRecyclerViewAdapter()
+        recyclerView.adapter = adapter
+        dataSource.all.subscribe { adapter.values = it }
     }
 
-    inner class SimpleItemRecyclerViewAdapter(private val values: List<ToDoData>) :
+    inner class SimpleItemRecyclerViewAdapter :
             RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
+
+        var values: List<ToDoData> = emptyList()
+            set(value) {
+                field = value
+                notifyDataSetChanged()
+            }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val inflater = LayoutInflater.from(parent.context)
