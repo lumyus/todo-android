@@ -1,8 +1,13 @@
 package net.xaethos.todofrontend.datasource
 
+import com.natpryce.hamkrest.isEmpty
+import com.natpryce.hamkrest.should.shouldMatch
+import net.xaethos.todofrontend.datasource.test.emits
+import net.xaethos.todofrontend.datasource.test.onNextEvents
+import net.xaethos.todofrontend.datasource.test.shouldEqual
+import net.xaethos.todofrontend.datasource.test.withTestSubscriber
 import org.junit.Test
 import kotlin.test.assertNotEquals
-import kotlin.test.expect
 
 class ModuleDataSourceTest {
 
@@ -16,54 +21,99 @@ class ModuleDataSourceTest {
 
     @Test
     fun initialItems() {
-        expect(seededItems) { dataSource.all }
+        dataSource.all shouldMatch emits(seededItems)
     }
 
     @Test
-    fun getByIndex() {
-        expect(seededItems[1]) { dataSource[1] }
-    }
-
-    @Test
-    fun getByUri() {
-        expect(seededItems[2]) { dataSource["todo/0"] }
-    }
-
-    @Test
-    fun create() {
-        val createdItem = dataSource.create("new title", "details")
-
-        expect(ToDoData(createdItem.uri, "new title", "details", completed = false)) { createdItem }
-
-        expect(listOf(
-                seededItems[0],
-                seededItems[1],
-                createdItem,
-                seededItems[2]
-        )) {
-            dataSource.all
+    fun observeAll() {
+        dataSource.all.withTestSubscriber { subscriber ->
+            subscriber shouldMatch onNextEvents(seededItems)
+            subscriber.assertNotCompleted()
         }
     }
 
     @Test
+    fun getByIndex() {
+        dataSource[1].withTestSubscriber { subscriber ->
+            subscriber shouldMatch onNextEvents(seededItems[1])
+            subscriber.assertNotCompleted()
+        }
+    }
+
+    @Test
+    fun getByUri() {
+        dataSource["todo/0"].withTestSubscriber { subscriber ->
+            subscriber shouldMatch onNextEvents(seededItems[2])
+            subscriber.assertNotCompleted()
+        }
+    }
+
+    @Test
+    fun getByUri_completesIfMissingUri() {
+        dataSource["does not exist"].withTestSubscriber { subscriber ->
+            subscriber.onNextEvents shouldMatch isEmpty
+            subscriber.assertCompleted()
+        }
+    }
+
+    @Test
+    fun create() {
+        dataSource.create("new title", "details").withTestSubscriber { subscriber ->
+            subscriber.assertNotCompleted()
+            val createdItem = subscriber.onNextEvents.single()
+
+            createdItem shouldEqual
+                    ToDoData(createdItem.uri, "new title", "details", completed = false)
+        }
+    }
+
+    @Test
+    fun create_emitsListUpdate() {
+        val createdItem = dataSource.create("new title", "details").toBlocking().first()
+        dataSource.all shouldMatch emits(listOf(
+                seededItems[0],
+                seededItems[1],
+                createdItem,
+                seededItems[2]
+        ))
+    }
+
+    @Test
     fun create_generatesDifferingUris() {
-        val fooItem = dataSource.create("title")
-        val barItem = dataSource.create("title")
+        val fooItem = dataSource.create("title").toBlocking().first()
+        val barItem = dataSource.create("title").toBlocking().first()
 
         assertNotEquals(fooItem.uri, barItem.uri)
     }
 
     @Test
-    fun put_whenExistingUri_updatesItem() {
+    fun put_whenExistingUri_updatesItemInPlace() {
         val updatedItem = ToDoData(uri = "todo/1", title = "Give a talk on application testing")
-
-        expect(listOf(
+        dataSource.put(updatedItem)
+        dataSource.all shouldMatch emits(listOf(
                 updatedItem,
                 seededItems[1],
                 seededItems[2]
-        )) {
+        ))
+    }
+
+    @Test
+    fun put_whenExistingUri_emitsUpdatedItem() {
+        val originalItem = seededItems[0]
+        val updatedItem = originalItem.copy(title = "new title")
+
+        dataSource[originalItem.uri].withTestSubscriber { subscriber ->
             dataSource.put(updatedItem)
-            dataSource.all
+
+            subscriber shouldMatch onNextEvents(originalItem, updatedItem)
+        }
+    }
+
+    @Test
+    fun put_noOpWhenNoChange() {
+        dataSource.all.withTestSubscriber { subscriber ->
+            dataSource.put(seededItems[0])
+            subscriber shouldMatch onNextEvents(seededItems)
         }
     }
 
@@ -72,71 +122,65 @@ class ModuleDataSourceTest {
         val completedItem = seededItems[0].copy(completed = true)
         val uncompletedItem = seededItems[2].copy(completed = false)
 
-        expect(listOf(
-                seededItems[1],
-                completedItem,
-                seededItems[2]
-        )) {
+        dataSource.all.withTestSubscriber { subscriber ->
             dataSource.put(completedItem)
-            dataSource.all
-        }
-
-        expect(listOf(
-                seededItems[1],
-                uncompletedItem,
-                completedItem
-        )) {
             dataSource.put(uncompletedItem)
-            dataSource.all
+
+            subscriber shouldMatch onNextEvents(
+                    listOf(seededItems[0], seededItems[1], seededItems[2]),
+                    listOf(seededItems[1], completedItem, seededItems[2]),
+                    listOf(seededItems[1], uncompletedItem, completedItem)
+            )
         }
     }
 
     @Test
     fun put_whenNewUri_insertsBeforeCompleted() {
         val newItem = ToDoData(uri = "todo/new", title = "another to do")
-
-        expect(listOf(
+        dataSource.put(newItem)
+        dataSource.all shouldMatch emits(listOf(
                 seededItems[0],
                 seededItems[1],
                 newItem,
                 seededItems[2]
-        )) {
-            dataSource.put(newItem)
-            dataSource.all
-        }
+        ))
     }
 
     @Test
     fun put_whenNewUri_andCompleted_insertsAtEnd() {
         val newItem = ToDoData(uri = "todo/new", title = "completed to do", completed = true)
-
-        expect(listOf(
+        dataSource.put(newItem)
+        dataSource.all shouldMatch emits(listOf(
                 seededItems[0],
                 seededItems[1],
                 seededItems[2],
                 newItem
-        )) {
-            dataSource.put(newItem)
-            dataSource.all
-        }
+        ))
     }
 
     @Test
     fun delete() {
-        expect(listOf(
+        dataSource.delete(seededItems[2].uri)
+        dataSource.all shouldMatch emits(listOf(
                 seededItems[0],
                 seededItems[1]
-        )) {
-            dataSource.delete(seededItems[2].uri)
-            dataSource.all
+        ))
+    }
+
+    @Test
+    fun delete_completesItemObservable() {
+        dataSource["todo/0"].withTestSubscriber { subscriber ->
+            dataSource.delete("todo/0")
+            subscriber shouldMatch onNextEvents(seededItems[2])
+            subscriber.assertCompleted()
         }
     }
 
     @Test
     fun delete_noOpOnMissingUri() {
-        expect(seededItems) {
+        dataSource.all.withTestSubscriber { subscriber ->
             dataSource.delete("non-existent")
-            dataSource.all
+            subscriber shouldMatch onNextEvents(seededItems)
         }
     }
 }

@@ -1,11 +1,13 @@
 package net.xaethos.todofrontend.singleactivity.todolist
 
+import android.support.annotation.VisibleForTesting
 import net.xaethos.todofrontend.datasource.ToDoData
 import net.xaethos.todofrontend.datasource.ToDoDataSource
 import net.xaethos.todofrontend.singleactivity.CollectionScope
 import net.xaethos.todofrontend.singleactivity.util.Logger
 import net.xaethos.todofrontend.singleactivity.util.Presenter
 import rx.Observable
+import rx.Subscription
 import rx.lang.kotlin.subscribeWith
 import javax.inject.Inject
 
@@ -17,13 +19,22 @@ class ToDoListMediator @Inject constructor(val navigator: Navigator) {
     @Inject lateinit var dataSource: ToDoDataSource
     @Inject lateinit var logger: Logger
 
-    private val toDos: List<ToDoData>
-        get() = dataSource.all
+    @VisibleForTesting var toDos: List<ToDoData> = emptyList()
 
     val itemCount: Int
         get() = toDos.size
 
-    fun bindItemPresenter(presenter: ItemPresenter, position: Int) {
+    fun itemId(index: Int): Long = toDos[index].uri.hashCode().toLong()
+
+    fun bindListPresenter(presenter: ListPresenter) =
+            dataSource.all.takeUntil(presenter.unbinds).subscribeWith {
+                onNext { newItems ->
+                    toDos = newItems
+                    presenter.notifyDataSetChanged()
+                }
+            }
+
+    fun bindItemPresenter(presenter: ItemPresenter, position: Int): Subscription {
         // First get the data to bind to
         val toDo = toDos[position]
 
@@ -32,7 +43,7 @@ class ToDoListMediator @Inject constructor(val navigator: Navigator) {
         presenter.urlText = toDo.uri
 
         // Finally, we subscribe to UI events
-        presenter.clicks.takeUntil(presenter.unbinds).subscribeWith {
+        return presenter.clicks.takeUntil(presenter.unbinds).subscribeWith {
             onNext { navigator.pushDetailController(toDo) }
             onError { logger.warn(it) }
         }
@@ -47,6 +58,10 @@ class ToDoListMediator @Inject constructor(val navigator: Navigator) {
      */
     interface Navigator {
         fun pushDetailController(toDo: ToDoData)
+    }
+
+    interface ListPresenter : Presenter {
+        fun notifyDataSetChanged()
     }
 
     /**

@@ -37,7 +37,9 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
         val viewComponent = createViewComponent()
         val view = inflater.inflate(R.layout.presenter_todo_list, container, false)
         val presenter = viewComponent.inject(ToDoListPresenter(view))
+        val mediator = viewComponent.mediator()
 
+        mediator.bindListPresenter(presenter)
         return presenter.root
     }
 
@@ -53,8 +55,12 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
     @CollectionScope
     class Adapter @Inject constructor(
             private val mediator: ToDoListMediator,
-            private var viewHolderInjector: MembersInjector<ToDoListPresenter.ItemHolder>
-    ) : RecyclerView.Adapter<ToDoListPresenter.ItemHolder>() {
+            private var viewHolderInjector: MembersInjector<ToDoListPresenter.ItemHolder>)
+    : RecyclerView.Adapter<ToDoListPresenter.ItemHolder>() {
+
+        init {
+            setHasStableIds(true)
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup,
                                         viewType: Int): ToDoListPresenter.ItemHolder {
@@ -65,12 +71,15 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
             return viewHolder
         }
 
-        override fun onBindViewHolder(holder: ToDoListPresenter.ItemHolder, position: Int) =
-                mediator.bindItemPresenter(holder, position)
+        override fun onBindViewHolder(holder: ToDoListPresenter.ItemHolder, position: Int) {
+            mediator.bindItemPresenter(holder, position)
+        }
 
         override fun onViewRecycled(holder: ToDoListPresenter.ItemHolder) = holder.onRecycle()
 
         override fun getItemCount() = mediator.itemCount
+
+        override fun getItemId(position: Int): Long = mediator.itemId(position)
     }
 
     /**
@@ -82,6 +91,7 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
     @CollectionScope @Subcomponent(modules = arrayOf(Module::class))
     interface ViewComponent {
         fun inject(presenter: ToDoListPresenter): ToDoListPresenter
+        fun mediator(): ToDoListMediator
 
         @Subcomponent.Builder
         interface Builder {

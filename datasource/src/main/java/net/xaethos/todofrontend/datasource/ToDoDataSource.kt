@@ -1,5 +1,9 @@
 package net.xaethos.todofrontend.datasource
 
+import rx.Observable
+import rx.lang.kotlin.BehaviorSubject
+import rx.lang.kotlin.emptyObservable
+import rx.subjects.BehaviorSubject
 import java.util.*
 
 interface ToDoDataSource {
@@ -7,27 +11,27 @@ interface ToDoDataSource {
     /**
      * A list of all to do items.
      */
-    val all: List<ToDoData>
+    val all: Observable<List<ToDoData>>
 
     /**
      * Get item by index
      */
-    operator fun get(index: Int): ToDoData
+    operator fun get(index: Int): Observable<ToDoData>
 
     /**
      * Find item by URI
      */
-    operator fun get(uri: String): ToDoData?
+    operator fun get(uri: String): Observable<ToDoData>
 
     /**
      * Create a new item
      */
-    fun create(title: String, details: String? = null): ToDoData
+    fun create(title: String, details: String? = null): Observable<ToDoData>
 
     /**
      * Insert or update an item
      */
-    fun put(item: ToDoData)
+    fun put(item: ToDoData): Observable<ToDoData>
 
     /**
      * Remove an item. Is a no-op if item is not present.
@@ -38,12 +42,11 @@ interface ToDoDataSource {
 
 internal class LocalSource : ToDoDataSource {
 
-    override val all = ArrayList<ToDoData>()
+    private val items = ArrayList<ToDoData>()
+    private val itemMap = HashMap<String, BehaviorSubject<ToDoData>>()
+    private val listSubject = BehaviorSubject<List<ToDoData>>()
 
-    /**
-     * A map of items, by URI.
-     */
-    private val itemMap = HashMap<String, ToDoData>()
+    override val all: Observable<List<ToDoData>> = listSubject.asObservable()
 
     init {
         insertItemUnsafe(ToDoData("todo/0", "Write To Do app", completed = true))
@@ -51,79 +54,83 @@ internal class LocalSource : ToDoDataSource {
         insertItemUnsafe(ToDoData("todo/2", "Do stuff", details = "I have stuff to do"))
     }
 
-    override fun get(index: Int) = all[index]
+    override fun get(index: Int) = get(items[index].uri)
 
-    override fun get(uri: String) = itemMap[uri]
+    override fun get(uri: String): Observable<ToDoData> =
+            itemMap[uri]?.asObservable() ?: emptyObservable()
 
-    override fun create(title: String, details: String?): ToDoData {
-        return synchronized(this) {
-            val id = System.nanoTime()
-            val item = ToDoData("todo/$id", title, details)
-            put(item)
-            item
-        }
-    }
-
-    override fun put(item: ToDoData) {
-        synchronized(this) {
-            if (itemMap.contains(item.uri)) {
-                updateItemUnsafe(item)
-            } else {
-                insertItemUnsafe(item)
+    override fun create(title: String, details: String?): Observable<ToDoData> =
+            synchronized(this) {
+                val id = System.nanoTime()
+                val item = ToDoData("todo/$id", title, details)
+                put(item)
             }
-        }
-    }
 
-    override fun delete(uri: String) {
-        synchronized(this) {
-            if (itemMap.contains(uri)) {
-                itemMap.remove(uri)
-                all.removeAt(findIndex(uri))
+    override fun put(item: ToDoData): Observable<ToDoData> =
+            synchronized(this) {
+                if (itemMap.contains(item.uri)) {
+                    updateItemUnsafe(item)
+                } else {
+                    insertItemUnsafe(item)
+                }
             }
-        }
-    }
+
+    override fun delete(uri: String) =
+            synchronized(this) {
+                if (itemMap.contains(uri)) {
+                    items.removeAt(findIndex(uri))
+                    itemMap.remove(uri)?.onCompleted()
+                    listSubject.onNext(items.toList())
+                }
+            }
 
     /**
      * Insert a new item in correct position. Assumes item is not in source. Not thread safe.
      */
-    private fun insertItemUnsafe(item: ToDoData) {
-        itemMap.put(item.uri, item)
+    private fun insertItemUnsafe(item: ToDoData): Observable<ToDoData> {
+        val itemSubject = BehaviorSubject(item)
+        itemMap.put(item.uri, itemSubject)
         if (item.completed) {
-            all.add(item)
+            items.add(item)
         } else {
-            all.add(findCompletedIndex(), item)
+            items.add(findCompletedIndex(), item)
         }
+        listSubject.onNext(items.toList())
+        return itemSubject
     }
 
     /**
      * Update an existing item. Assumes item is already in source. Not thread safe.
      */
-    private fun updateItemUnsafe(item: ToDoData) {
+    private fun updateItemUnsafe(item: ToDoData): Observable<ToDoData> {
         val key = item.uri
-        val currentItem = itemMap[key]!!
+        val itemSubject = itemMap[key] ?: throw IllegalArgumentException("Item missing: $item")
+        val currentItem = itemSubject.value
 
         if (item != currentItem) {
             val currentIndex = findIndex(key)
 
-            itemMap[key] = item
             if (item.completed == currentItem.completed) {
-                all[currentIndex] = item
+                items[currentIndex] = item
             } else {
-                all.removeAt(currentIndex)
-                all.add(findCompletedIndex(), item)
+                items.removeAt(currentIndex)
+                items.add(findCompletedIndex(), item)
             }
+            itemSubject.onNext(item)
+            listSubject.onNext(items.toList())
         }
+        return itemSubject.asObservable()
     }
 
     private fun findIndex(uri: String): Int {
-        return all.indexOfFirst { it.uri == uri }
+        return items.indexOfFirst { it.uri == uri }
     }
 
     /**
      * Find the index where completed items would start
      */
     private fun findCompletedIndex(): Int {
-        val index = all.indexOfFirst { it.completed }
-        return if (index < 0) all.size else index
+        val index = items.indexOfFirst { it.completed }
+        return if (index < 0) items.size else index
     }
 }

@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import net.xaethos.todofrontend.datasource.ToDoData
 import net.xaethos.todofrontend.datasource.ToDoDataSource
+import rx.subscriptions.Subscriptions
 import javax.inject.Inject
 
 /**
@@ -21,38 +21,40 @@ class ToDoDetailFragment : Fragment() {
 
     @Inject lateinit var dataSource: ToDoDataSource
 
-    /**
-     * The dummy content this fragment is presenting.
-     */
-    private var item: ToDoData? = null
+    private var appBarLayout: CollapsingToolbarLayout? = null
+    private var subscription = Subscriptions.unsubscribed()
+
+    private val itemId: String?
+        get() = arguments.getString(ARG_ITEM_ID)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        appBarLayout = activity.findViewById(R.id.toolbar_layout) as CollapsingToolbarLayout?
+
         singletonComponent.inject(this)
-
-        if (arguments.containsKey(ARG_ITEM_ID)) {
-            // Load the dummy content specified by the fragment
-            // arguments. In a real-world scenario, use a Loader
-            // to load content from a content provider.
-            val itemId = arguments.getString(ARG_ITEM_ID)
-            val item: ToDoData? = dataSource[itemId]
-            this.item = item
-
-            val appBarLayout = activity.findViewById(R.id.toolbar_layout) as CollapsingToolbarLayout?
-            appBarLayout?.title = item?.title
-        }
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val rootView = inflater!!.inflate(R.layout.todo_detail, container, false)
+            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val rootView = inflater.inflate(R.layout.todo_detail, container, false)
 
-        // Show the dummy content as text in a TextView.
-        val detailView = rootView.findViewById(R.id.todo_detail) as TextView
-        detailView.text = item?.details
+        itemId?.let { itemId ->
+            subscription = dataSource[itemId].subscribe { item ->
+                appBarLayout?.title = item.title
+
+                // Show the dummy content as text in a TextView.
+                val detailView = rootView.findViewById(R.id.todo_detail) as TextView
+                detailView.text = item?.details
+            }
+        }
 
         return rootView
+    }
+
+    override fun onDestroyView() {
+        subscription.unsubscribe()
+        super.onDestroyView()
     }
 
     companion object {
