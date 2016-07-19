@@ -1,16 +1,24 @@
 package net.xaethos.todofrontend.singleactivity.util
 
+import android.view.View
 import android.widget.CompoundButton
 import android.widget.TextView
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.*
+import kotlin.reflect.KFunction1
+import kotlin.reflect.KFunction2
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty1
 
 fun textViewText(textView: TextView): ReadWriteProperty<Any?, CharSequence?> =
         mapping<TextView, CharSequence?>(textView, TextView::getText, TextView::setText)
 
 fun compoundButtonChecked(button: CompoundButton): ReadWriteProperty<Any?, Boolean> =
         mapping(button, CompoundButton::isChecked, CompoundButton::setChecked)
+
+fun viewEnabled(view: View): ReadWriteProperty<Any?, Boolean> =
+        mapping(view, View::isEnabled, View::setEnabled)
 
 fun <T, V> forwarding(target: T,
                       kProperty: KProperty1<T, V>) = object : ReadOnlyProperty<Any?, V> {

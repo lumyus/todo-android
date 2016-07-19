@@ -1,5 +1,7 @@
 package net.xaethos.todofrontend.singleactivity.todolist
 
+import android.graphics.Paint
+import android.support.design.widget.FloatingActionButton
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
@@ -9,7 +11,10 @@ import com.jakewharton.rxbinding.view.clicks
 import com.jakewharton.rxbinding.widget.checkedChanges
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.SingleActivity
-import net.xaethos.todofrontend.singleactivity.util.*
+import net.xaethos.todofrontend.singleactivity.util.Presenter
+import net.xaethos.todofrontend.singleactivity.util.ViewHolderPresenter
+import net.xaethos.todofrontend.singleactivity.util.bindView
+import net.xaethos.todofrontend.singleactivity.util.textViewText
 import rx.Observable
 import javax.inject.Inject
 
@@ -26,8 +31,12 @@ import javax.inject.Inject
  * a second call to [Controller.onCreateView] wouldn't reinitialize the bindings.
  */
 class ListPresenter(override val root: View) : Presenter, ListMediator.ListPresenter {
-    val toolbar by bindView<Toolbar>(R.id.toolbar)
-    val listView by bindView<RecyclerView>(R.id.todo_list)
+    private val toolbar by bindView<Toolbar>(R.id.toolbar)
+    private val listView by bindView<RecyclerView>(R.id.todo_list)
+    private val fab: FloatingActionButton by bindView(R.id.fab)
+
+    override val fabClicks: Observable<Unit>
+        get() = fab.clicks().takeUntil(unbinds)
 
     @Inject lateinit var adapter: ListController.Adapter
     @Inject override lateinit var unbinds: Observable<Unit>
@@ -48,10 +57,21 @@ class ListPresenter(override val root: View) : Presenter, ListMediator.ListPrese
 
         override var titleText by textViewText(titleView)
         override var urlText by textViewText(uriView)
-        override var isChecked by compoundButtonChecked(completedView)
+        override var isChecked: Boolean
+            get() = completedView.isChecked
+            set(value) {
+                completedView.isChecked = value
+                if (value) {
+                    titleView.paintFlags = titleView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                } else {
+                    titleView.paintFlags = titleView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                }
+            }
 
-        override val clicks: Observable<Unit> = root.clicks()
-        override val checkedChanges: Observable<Boolean> = completedView.checkedChanges()
+        override val clicks: Observable<Unit>
+            get() = root.clicks().takeUntil(unbinds)
+        override val checkedChanges: Observable<Boolean>
+            get() = completedView.checkedChanges().takeUntil(unbinds)
 
         @Inject override lateinit var controllerUnbinds: Observable<Unit>
     }

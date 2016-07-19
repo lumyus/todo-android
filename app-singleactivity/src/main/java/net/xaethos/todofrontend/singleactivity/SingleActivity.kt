@@ -10,6 +10,7 @@ import com.bluelinelabs.conductor.Router
 import dagger.Provides
 import dagger.Subcomponent
 import net.xaethos.todofrontend.singleactivity.tododetail.DetailController
+import net.xaethos.todofrontend.singleactivity.todoedit.EditController
 import net.xaethos.todofrontend.singleactivity.todolist.ListController
 import net.xaethos.todofrontend.singleactivity.util.bindView
 import net.xaethos.todofrontend.singleactivity.util.routerTransaction
@@ -41,6 +42,7 @@ class SingleActivity : AppCompatActivity() {
     interface Component {
         fun listComponentBuilder(): ListController.ViewComponent.Builder
         fun detailComponentBuilder(): DetailController.ViewComponent.Builder
+        fun editComponentBuilder(): EditController.ViewComponent.Builder
     }
 
     @dagger.Module

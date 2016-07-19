@@ -1,37 +1,33 @@
-package net.xaethos.todofrontend.singleactivity.tododetail
+package net.xaethos.todofrontend.singleactivity.todoedit
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
 import com.bluelinelabs.conductor.rxlifecycle.RxController
 import dagger.Provides
 import dagger.Subcomponent
-import net.xaethos.todofrontend.datasource.Todo
 import net.xaethos.todofrontend.singleactivity.ItemScope
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.component
-import net.xaethos.todofrontend.singleactivity.todoedit.EditController
 import net.xaethos.todofrontend.singleactivity.util.DataBundle
 import net.xaethos.todofrontend.singleactivity.util.RxControllerModule
-import net.xaethos.todofrontend.singleactivity.util.routerTransaction
 
 /**
  * Controller: lifecycle, navigation and dependency injection
  */
-class DetailController(val args: Arguments) : RxController(args.bundle), DetailMediator.Navigator {
+class EditController(val args: Arguments) : RxController(args.bundle), EditMediator.Navigator {
 
     @Suppress("unused")
     constructor(bundle: Bundle) : this(Arguments(bundle))
 
     companion object {
-        fun create(uri: String): DetailController {
-            val args = DetailController.Arguments(Bundle()).apply {
+        fun create(uri: String? = null): EditController {
+            val args = EditController.Arguments(Bundle()).apply {
                 this.uri = uri
             }
-            return DetailController(args)
+            return EditController(args)
         }
     }
 
@@ -41,11 +37,11 @@ class DetailController(val args: Arguments) : RxController(args.bundle), DetailM
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         val viewComponent = createViewComponent()
-        val view = inflater.inflate(R.layout.presenter_todo_detail, container, false)
-        val presenter = viewComponent.inject(DetailPresenter(view))
+        val view = inflater.inflate(R.layout.presenter_todo_edit, container, false)
+        val presenter = viewComponent.inject(EditPresenter(view))
         val mediator = viewComponent.mediator()
 
-        mediator.bindPresenter(presenter, args.uri!!)
+        mediator.bindPresenter(presenter, args.uri)
         return presenter.root
     }
 
@@ -57,12 +53,11 @@ class DetailController(val args: Arguments) : RxController(args.bundle), DetailM
         return true
     }
 
-    override fun pushEditController(todo: Todo) =
-            router.pushController(EditController.create(todo.uri).routerTransaction()
-                    .pushChangeHandler(FadeChangeHandler())
-                    .popChangeHandler(FadeChangeHandler()))
+    override fun navigateBack() {
+        router.popCurrentController()
+    }
 
-    private fun createViewComponent() = activity.component.detailComponentBuilder()
+    private fun createViewComponent() = activity.component.editComponentBuilder()
             .controllerModule(Module())
             .build()
 
@@ -72,8 +67,8 @@ class DetailController(val args: Arguments) : RxController(args.bundle), DetailM
 
     @ItemScope @Subcomponent(modules = arrayOf(Module::class))
     interface ViewComponent {
-        fun inject(viewHolder: DetailPresenter): DetailPresenter
-        fun mediator(): DetailMediator
+        fun inject(viewHolder: EditPresenter): EditPresenter
+        fun mediator(): EditMediator
 
         @Subcomponent.Builder
         interface Builder {
@@ -84,6 +79,6 @@ class DetailController(val args: Arguments) : RxController(args.bundle), DetailM
 
     @dagger.Module
     inner class Module : RxControllerModule(this) {
-        @Provides fun navigator(): DetailMediator.Navigator = this@DetailController
+        @Provides fun navigator(): EditMediator.Navigator = this@EditController
     }
 }

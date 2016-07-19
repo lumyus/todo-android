@@ -25,13 +25,14 @@ class ListMediator @Inject constructor(val navigator: Navigator) {
 
     fun itemId(index: Int): Long = todoList[index].uri.hashCode().toLong()
 
-    fun bindListPresenter(presenter: ListPresenter) =
-            dataSource.all.takeUntil(presenter.unbinds).subscribeWith {
-                onNext { newItems ->
-                    todoList = newItems
-                    presenter.notifyDataSetChanged()
-                }
-            }
+    fun bindListPresenter(presenter: ListPresenter) {
+        dataSource.all.takeUntil(presenter.unbinds).subscribe { newItems ->
+            todoList = newItems
+            presenter.notifyDataSetChanged()
+        }
+
+        presenter.fabClicks.subscribe { navigator.pushCreateController() }
+    }
 
     fun bindItemPresenter(presenter: ItemPresenter, position: Int) {
         // First get the data to bind to
@@ -43,7 +44,7 @@ class ListMediator @Inject constructor(val navigator: Navigator) {
         presenter.isChecked = todo.completed
 
         // Finally, we subscribe to UI events
-        presenter.clicks.takeUntil(presenter.unbinds).subscribeWith {
+        presenter.clicks.subscribeWith {
             onNext { navigator.pushDetailController(todo) }
             onError { logger.warn(it) }
         }
@@ -61,10 +62,12 @@ class ListMediator @Inject constructor(val navigator: Navigator) {
      */
     interface Navigator {
         fun pushDetailController(todo: Todo)
+        fun pushCreateController()
     }
 
     interface ListPresenter : Presenter {
         fun notifyDataSetChanged()
+        val fabClicks: Observable<Unit>
     }
 
     /**

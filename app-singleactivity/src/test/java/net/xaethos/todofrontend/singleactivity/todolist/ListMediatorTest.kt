@@ -13,8 +13,6 @@ import org.mockito.Mockito.verify
 import rx.lang.kotlin.BehaviorSubject
 import rx.lang.kotlin.PublishSubject
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 class ListMediatorTest {
 
@@ -56,15 +54,6 @@ class ListMediatorTest {
 
         verify(listPresenter).notifyDataSetChanged()
         mediator.todoList shouldMatch equalTo(data)
-    }
-
-    @Test
-    fun bindListPresenter_unsubscribesOnUnbind() {
-        val subscription = mediator.bindListPresenter(listPresenter)
-        assertFalse(subscription.isUnsubscribed)
-
-        unbindSubject.onNext(Unit)
-        assertTrue(subscription.isUnsubscribed)
     }
 
     @Test

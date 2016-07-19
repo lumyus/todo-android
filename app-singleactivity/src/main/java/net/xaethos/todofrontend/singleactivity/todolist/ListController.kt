@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
+import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler
 import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler
 import com.bluelinelabs.conductor.rxlifecycle.RxController
 import dagger.MembersInjector
@@ -15,6 +16,7 @@ import net.xaethos.todofrontend.singleactivity.CollectionScope
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.component
 import net.xaethos.todofrontend.singleactivity.tododetail.DetailController
+import net.xaethos.todofrontend.singleactivity.todoedit.EditController
 import net.xaethos.todofrontend.singleactivity.util.RxControllerModule
 import net.xaethos.todofrontend.singleactivity.util.routerTransaction
 import javax.inject.Inject
@@ -45,6 +47,11 @@ class ListController() : RxController(), ListMediator.Navigator {
 
     override fun pushDetailController(todo: Todo) =
             router.pushController(DetailController.create(todo.uri).routerTransaction()
+                    .pushChangeHandler(HorizontalChangeHandler())
+                    .popChangeHandler(HorizontalChangeHandler()))
+
+    override fun pushCreateController() =
+            router.pushController(EditController.create().routerTransaction()
                     .pushChangeHandler(VerticalChangeHandler())
                     .popChangeHandler(FadeChangeHandler()))
 
