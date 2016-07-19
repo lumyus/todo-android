@@ -24,6 +24,8 @@ class ToDoListMediator @Inject constructor(val navigator: Navigator) {
     val itemCount: Int
         get() = toDos.size
 
+    fun itemId(index: Int): Long = toDos[index].uri.hashCode().toLong()
+
     fun bindListPresenter(presenter: ListPresenter) =
             dataSource.all.takeUntil(presenter.unbinds).subscribeWith {
                 onNext { newItems ->

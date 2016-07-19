@@ -55,8 +55,12 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
     @CollectionScope
     class Adapter @Inject constructor(
             private val mediator: ToDoListMediator,
-            private var viewHolderInjector: MembersInjector<ToDoListPresenter.ItemHolder>
-    ) : RecyclerView.Adapter<ToDoListPresenter.ItemHolder>() {
+            private var viewHolderInjector: MembersInjector<ToDoListPresenter.ItemHolder>)
+    : RecyclerView.Adapter<ToDoListPresenter.ItemHolder>() {
+
+        init {
+            setHasStableIds(true)
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup,
                                         viewType: Int): ToDoListPresenter.ItemHolder {
@@ -74,6 +78,8 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
         override fun onViewRecycled(holder: ToDoListPresenter.ItemHolder) = holder.onRecycle()
 
         override fun getItemCount() = mediator.itemCount
+
+        override fun getItemId(position: Int): Long = mediator.itemId(position)
     }
 
     /**

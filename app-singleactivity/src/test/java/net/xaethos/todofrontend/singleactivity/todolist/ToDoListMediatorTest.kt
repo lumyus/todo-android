@@ -105,6 +105,12 @@ class ToDoListMediatorTest {
         mediator.toDos = data
         assertEquals(4, mediator.itemCount)
     }
+
+    @Test
+    fun itemId() {
+        mediator.toDos = data
+        assertEquals(data[2].uri.hashCode().toLong(), mediator.itemId(2))
+    }
 }
 
 private fun todo(id: Int) = ToDoData("http://example.com/todo/$id", "To Do $id")
