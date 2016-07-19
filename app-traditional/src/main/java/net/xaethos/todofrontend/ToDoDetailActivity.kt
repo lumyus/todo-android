@@ -10,12 +10,12 @@ import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 
 /**
- * An activity representing a single ToDo detail screen. This
+ * An activity representing a single to do detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
- * in a [ToDoListActivity].
+ * in a [TodoListActivity].
  */
-class ToDoDetailActivity : AppCompatActivity() {
+class TodoDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,10 +46,10 @@ class ToDoDetailActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
-            val fragment = ToDoDetailFragment()
+            val fragment = TodoDetailFragment()
             fragment.arguments = Bundle().apply {
-                putString(ToDoDetailFragment.ARG_ITEM_ID,
-                        intent.getStringExtra(ToDoDetailFragment.ARG_ITEM_ID))
+                putString(TodoDetailFragment.ARG_ITEM_ID,
+                        intent.getStringExtra(TodoDetailFragment.ARG_ITEM_ID))
             }
             supportFragmentManager.beginTransaction()
                     .add(R.id.todo_detail_container, fragment)
@@ -67,7 +67,7 @@ class ToDoDetailActivity : AppCompatActivity() {
                 //
                 // http://developer.android.com/design/patterns/navigation.html#up-vs-back
                 //
-                NavUtils.navigateUpTo(this, Intent(this, ToDoListActivity::class.java))
+                NavUtils.navigateUpTo(this, Intent(this, TodoListActivity::class.java))
                 return true
             }
             else -> return super.onOptionsItemSelected(item)

@@ -13,14 +13,16 @@ inline fun <reified T : Any> mock(initialization: T.() -> Unit): T =
 
 fun <T> stub(methodCall: T): OngoingStubbing<T> = Mockito.`when`(methodCall)
 
-inline fun <R> OngoingStubbing<R>.with(crossinline answer: () -> R) = then { invocation -> answer() }
+inline fun <R> OngoingStubbing<R>.with(crossinline answer: () -> R): OngoingStubbing<R> =
+        then { invocation -> answer() }
 
-inline fun <reified P0 : Any, R> OngoingStubbing<R>.with(crossinline answer: (P0) -> R) = then { invocation ->
-    assertTrue("invocation has enough parameters") { invocation.arguments.size >= 1 }
-    answer(
-            invocation.getArgumentAt(0, P0::class.java)
-    )
-}
+inline fun <reified P0 : Any, R> OngoingStubbing<R>.with(crossinline answer: (P0) -> R): OngoingStubbing<R> =
+        then { invocation ->
+            assertTrue("invocation has enough parameters") { invocation.arguments.size >= 1 }
+            answer(
+                    invocation.getArgumentAt(0, P0::class.java)
+            )
+        }
 
 fun <T> OngoingStubbing<Observable<T>>.withSubject(subject: Subject<T, T>): Subject<T, T> {
     thenReturn(subject.asObservable())

@@ -48,7 +48,7 @@
             android:layout_height="match_parent"
             android:padding="16dp"
             android:textIsSelectable="true"
-            tools:context="net.xaethos.todofrontend.ToDoDetailFragment" />
+            tools:context="net.xaethos.todofrontend.TodoDetailFragment" />
     </android.support.v4.widget.NestedScrollView>
 
     <android.support.design.widget.FloatingActionButton

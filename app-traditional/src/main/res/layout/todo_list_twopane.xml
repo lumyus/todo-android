@@ -9,10 +9,10 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context="net.xaethos.todofrontend.ToDoListActivity">
+    tools:context="net.xaethos.todofrontend.TodoListActivity">
 
     <!--
-    This layout is a two-pane layout for the ToDos
+    This layout is a two-pane layout for the to-dos
     master/detail flow.
     See res/values-large/refs.xml and
     res/values-w900dp/refs.xml for an example of layout aliases
@@ -24,7 +24,7 @@
     -->
 
     <android.support.v7.widget.RecyclerView android:id="@+id/todo_list"
-        android:name="net.xaethos.todofrontend.ToDoListFragment"
+        android:name="net.xaethos.todofrontend.TodoListFragment"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="@dimen/item_width"
@@ -32,7 +32,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
-        tools:context="net.xaethos.todofrontend.ToDoListActivity"
+        tools:context="net.xaethos.todofrontend.TodoListActivity"
         tools:listitem="@layout/todo_list_content" />
 
     <FrameLayout

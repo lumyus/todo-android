@@ -8,7 +8,7 @@ import dagger.Module
 import dagger.Provides
 import rx.Observable
 
-fun Controller.routerTransaction() = RouterTransaction.with(this)
+fun Controller.routerTransaction(): RouterTransaction = RouterTransaction.with(this)
 
 @Module
 open class RxControllerModule(val controller: RxController) {

@@ -2,8 +2,8 @@ package net.xaethos.todofrontend.singleactivity.todolist
 
 import com.natpryce.hamkrest.equalTo
 import com.natpryce.hamkrest.should.shouldMatch
-import net.xaethos.todofrontend.datasource.ToDoData
-import net.xaethos.todofrontend.datasource.ToDoDataSource
+import net.xaethos.todofrontend.datasource.Todo
+import net.xaethos.todofrontend.datasource.TodoDataSource
 import net.xaethos.todofrontend.singleactivity.test.mock
 import net.xaethos.todofrontend.singleactivity.test.stub
 import net.xaethos.todofrontend.singleactivity.test.withSubject
@@ -16,7 +16,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class ToDoListMediatorTest {
+class ListMediatorTest {
 
     val data = listOf(
             todo(0),
@@ -30,20 +30,20 @@ class ToDoListMediatorTest {
     val checkedSubject = PublishSubject<Boolean>()
     val unbindSubject = PublishSubject<Unit>()
 
-    val navigator: ToDoListMediator.Navigator = mock()
-    val dataSource: ToDoDataSource = mock {
+    val navigator: ListMediator.Navigator = mock()
+    val dataSource: TodoDataSource = mock {
         stub(all).withSubject(dataSubject)
     }
-    val listPresenter: ToDoListMediator.ListPresenter = mock {
+    val listPresenter: ListMediator.ListPresenter = mock {
         stub(unbinds).withSubject(unbindSubject)
     }
-    val itemPresenter: ToDoListMediator.ItemPresenter = mock {
+    val itemPresenter: ListMediator.ItemPresenter = mock {
         stub(clicks).withSubject(clickSubject)
         stub(checkedChanges).withSubject(checkedSubject)
         stub(unbinds).withSubject(unbindSubject)
     }
 
-    val mediator = ToDoListMediator(navigator)
+    val mediator = ListMediator(navigator)
 
     @Before
     fun setUp() {
@@ -55,7 +55,7 @@ class ToDoListMediatorTest {
         mediator.bindListPresenter(listPresenter)
 
         verify(listPresenter).notifyDataSetChanged()
-        mediator.toDos shouldMatch equalTo(data)
+        mediator.todoList shouldMatch equalTo(data)
     }
 
     @Test
@@ -69,9 +69,9 @@ class ToDoListMediatorTest {
 
     @Test
     fun bindItemPresenter() {
-        mediator.toDos = listOf(
-                ToDoData("todo/10", "title", completed = true),
-                ToDoData("todo/1", "To Do 1")
+        mediator.todoList = listOf(
+                Todo("todo/10", "title", completed = true),
+                Todo("todo/1", "To Do 1")
         )
 
         mediator.bindItemPresenter(itemPresenter, 0)
@@ -87,7 +87,7 @@ class ToDoListMediatorTest {
 
     @Test
     fun onItemClick_showDetails() {
-        mediator.toDos = data
+        mediator.todoList = data
         mediator.bindItemPresenter(itemPresenter, 2)
 
         clickSubject.onNext(Unit)
@@ -97,8 +97,8 @@ class ToDoListMediatorTest {
 
     @Test
     fun onItemChecked_updateData() {
-        val item = ToDoData("todo/13", "doable")
-        mediator.toDos = listOf(item)
+        val item = Todo("todo/13", "doable")
+        mediator.todoList = listOf(item)
         mediator.bindItemPresenter(itemPresenter, 0)
 
         checkedSubject.onNext(true)
@@ -108,15 +108,15 @@ class ToDoListMediatorTest {
 
     @Test
     fun itemCount() {
-        mediator.toDos = data
+        mediator.todoList = data
         assertEquals(4, mediator.itemCount)
     }
 
     @Test
     fun itemId() {
-        mediator.toDos = data
+        mediator.todoList = data
         assertEquals(data[2].uri.hashCode().toLong(), mediator.itemId(2))
     }
 }
 
-private fun todo(id: Int) = ToDoData("http://example.com/todo/$id", "To Do $id")
+private fun todo(id: Int) = Todo("http://example.com/todo/$id", "To Do $id")

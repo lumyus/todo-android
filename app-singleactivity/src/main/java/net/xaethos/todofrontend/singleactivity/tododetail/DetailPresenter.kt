@@ -15,7 +15,7 @@ import javax.inject.Inject
 /**
  * View presenter: UI controls and events
  */
-class ToDoDetailPresenter(override val root: View) : Presenter, ToDoDetailMediator.ViewPresenter {
+class DetailPresenter(override val root: View) : Presenter, DetailMediator.ViewPresenter {
     private val appBarLayout: CollapsingToolbarLayout by bindView(R.id.toolbar_layout)
     private val toolbar: Toolbar by bindView(R.id.detail_toolbar)
     private val detailView: TextView by bindView(R.id.todo_detail)

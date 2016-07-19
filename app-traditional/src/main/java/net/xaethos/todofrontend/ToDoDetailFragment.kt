@@ -7,19 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import net.xaethos.todofrontend.datasource.ToDoDataSource
+import net.xaethos.todofrontend.datasource.TodoDataSource
 import rx.subscriptions.Subscriptions
 import javax.inject.Inject
 
 /**
- * A fragment representing a single ToDo detail screen.
- * This fragment is either contained in a [ToDoListActivity]
- * in two-pane mode (on tablets) or a [ToDoDetailActivity]
+ * A fragment representing a single to do detail screen.
+ * This fragment is either contained in a [TodoListActivity]
+ * in two-pane mode (on tablets) or a [TodoDetailActivity]
  * on handsets.
  */
-class ToDoDetailFragment : Fragment() {
+class TodoDetailFragment : Fragment() {
 
-    @Inject lateinit var dataSource: ToDoDataSource
+    @Inject lateinit var dataSource: TodoDataSource
 
     private var appBarLayout: CollapsingToolbarLayout? = null
     private var subscription = Subscriptions.unsubscribed()

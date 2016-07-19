@@ -4,7 +4,9 @@ import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.RecyclerViewActions
-import android.support.test.espresso.matcher.ViewMatchers.*
+import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
+import android.support.test.espresso.matcher.ViewMatchers.withId
+import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.runner.AndroidJUnit4
 import android.support.v7.widget.RecyclerView
 import android.test.suitebuilder.annotation.LargeTest
@@ -22,7 +24,7 @@ class HappyPathFeature {
 
     @get:Rule var activityRule = activityTestRule<SingleActivity>()
 
-    @Test fun seeToDoDetails() {
+    @Test fun seeTodoDetails() {
         // Scroll down list and tap on to do
         onView(withId(R.id.todo_list))
                 .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(1))

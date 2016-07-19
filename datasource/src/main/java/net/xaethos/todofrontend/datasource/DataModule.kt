@@ -8,6 +8,6 @@ import javax.inject.Singleton
 class DataModule {
 
     @Provides @Singleton
-    fun dataSource(): ToDoDataSource = LocalSource()
+    fun dataSource(): TodoDataSource = LocalSource()
 
 }

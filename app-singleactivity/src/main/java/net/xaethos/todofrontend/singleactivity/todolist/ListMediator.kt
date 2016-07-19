@@ -1,8 +1,8 @@
 package net.xaethos.todofrontend.singleactivity.todolist
 
 import android.support.annotation.VisibleForTesting
-import net.xaethos.todofrontend.datasource.ToDoData
-import net.xaethos.todofrontend.datasource.ToDoDataSource
+import net.xaethos.todofrontend.datasource.Todo
+import net.xaethos.todofrontend.datasource.TodoDataSource
 import net.xaethos.todofrontend.singleactivity.CollectionScope
 import net.xaethos.todofrontend.singleactivity.util.Logger
 import net.xaethos.todofrontend.singleactivity.util.Presenter
@@ -14,41 +14,41 @@ import javax.inject.Inject
  * Mediator: All business logic goes here
  */
 @CollectionScope
-class ToDoListMediator @Inject constructor(val navigator: Navigator) {
-    @Inject lateinit var dataSource: ToDoDataSource
+class ListMediator @Inject constructor(val navigator: Navigator) {
+    @Inject lateinit var dataSource: TodoDataSource
     @Inject lateinit var logger: Logger
 
-    @VisibleForTesting var toDos: List<ToDoData> = emptyList()
+    @VisibleForTesting var todoList: List<Todo> = emptyList()
 
     val itemCount: Int
-        get() = toDos.size
+        get() = todoList.size
 
-    fun itemId(index: Int): Long = toDos[index].uri.hashCode().toLong()
+    fun itemId(index: Int): Long = todoList[index].uri.hashCode().toLong()
 
     fun bindListPresenter(presenter: ListPresenter) =
             dataSource.all.takeUntil(presenter.unbinds).subscribeWith {
                 onNext { newItems ->
-                    toDos = newItems
+                    todoList = newItems
                     presenter.notifyDataSetChanged()
                 }
             }
 
     fun bindItemPresenter(presenter: ItemPresenter, position: Int) {
         // First get the data to bind to
-        val toDo = toDos[position]
+        val todo = todoList[position]
 
         // We now set the state of the presenter to reflect its position
-        presenter.titleText = toDo.title
-        presenter.urlText = toDo.uri
-        presenter.isChecked = toDo.completed
+        presenter.titleText = todo.title
+        presenter.urlText = todo.uri
+        presenter.isChecked = todo.completed
 
         // Finally, we subscribe to UI events
         presenter.clicks.takeUntil(presenter.unbinds).subscribeWith {
-            onNext { navigator.pushDetailController(toDo) }
+            onNext { navigator.pushDetailController(todo) }
             onError { logger.warn(it) }
         }
         presenter.checkedChanges.takeUntil(presenter.unbinds).subscribe { checked ->
-            dataSource.put(toDo.copy(completed = checked))
+            dataSource.put(todo.copy(completed = checked))
         }
     }
 
@@ -60,7 +60,7 @@ class ToDoListMediator @Inject constructor(val navigator: Navigator) {
      * a detail view.
      */
     interface Navigator {
-        fun pushDetailController(toDo: ToDoData)
+        fun pushDetailController(todo: Todo)
     }
 
     interface ListPresenter : Presenter {

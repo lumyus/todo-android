@@ -11,21 +11,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import net.xaethos.todofrontend.datasource.ToDoData
-import net.xaethos.todofrontend.datasource.ToDoDataSource
+import net.xaethos.todofrontend.datasource.Todo
+import net.xaethos.todofrontend.datasource.TodoDataSource
 import javax.inject.Inject
 
 /**
- * An activity representing a list of ToDos. This activity
+ * An activity representing a list of to dos. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
- * lead to a [ToDoDetailActivity] representing
+ * lead to a [TodoDetailActivity] representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-class ToDoListActivity : AppCompatActivity() {
+class TodoListActivity : AppCompatActivity() {
 
-    @Inject lateinit var dataSource: ToDoDataSource
+    @Inject lateinit var dataSource: TodoDataSource
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -70,7 +70,7 @@ class ToDoListActivity : AppCompatActivity() {
     inner class SimpleItemRecyclerViewAdapter :
             RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
 
-        var values: List<ToDoData> = emptyList()
+        var values: List<Todo> = emptyList()
             set(value) {
                 field = value
                 notifyDataSetChanged()
@@ -88,17 +88,17 @@ class ToDoListActivity : AppCompatActivity() {
 
             holder.itemView.setOnClickListener { v ->
                 if (twoPane) {
-                    val fragment = ToDoDetailFragment()
+                    val fragment = TodoDetailFragment()
                     fragment.arguments = Bundle().apply {
-                        putString(ToDoDetailFragment.ARG_ITEM_ID, item.uri)
+                        putString(TodoDetailFragment.ARG_ITEM_ID, item.uri)
                     }
                     supportFragmentManager.beginTransaction()
                             .replace(R.id.todo_detail_container, fragment)
                             .commit()
                 } else {
                     val context = v.context
-                    val intent = Intent(context, ToDoDetailActivity::class.java)
-                    intent.putExtra(ToDoDetailFragment.ARG_ITEM_ID, item.uri)
+                    val intent = Intent(context, TodoDetailActivity::class.java)
+                    intent.putExtra(TodoDetailFragment.ARG_ITEM_ID, item.uri)
                     context.startActivity(intent)
                 }
             }

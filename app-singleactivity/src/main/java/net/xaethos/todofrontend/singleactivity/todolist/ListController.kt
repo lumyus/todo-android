@@ -10,11 +10,11 @@ import com.bluelinelabs.conductor.rxlifecycle.RxController
 import dagger.MembersInjector
 import dagger.Provides
 import dagger.Subcomponent
-import net.xaethos.todofrontend.datasource.ToDoData
+import net.xaethos.todofrontend.datasource.Todo
 import net.xaethos.todofrontend.singleactivity.CollectionScope
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.component
-import net.xaethos.todofrontend.singleactivity.tododetail.ToDoDetailController
+import net.xaethos.todofrontend.singleactivity.tododetail.DetailController
 import net.xaethos.todofrontend.singleactivity.util.RxControllerModule
 import net.xaethos.todofrontend.singleactivity.util.routerTransaction
 import javax.inject.Inject
@@ -32,49 +32,49 @@ import javax.inject.Inject
  *
  * Finally, controllers handle dependency injection for mediators and presenters.
  */
-class ToDoListController() : RxController(), ToDoListMediator.Navigator {
+class ListController() : RxController(), ListMediator.Navigator {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         val viewComponent = createViewComponent()
         val view = inflater.inflate(R.layout.presenter_todo_list, container, false)
-        val presenter = viewComponent.inject(ToDoListPresenter(view))
+        val presenter = viewComponent.inject(ListPresenter(view))
         val mediator = viewComponent.mediator()
 
         mediator.bindListPresenter(presenter)
         return presenter.root
     }
 
-    override fun pushDetailController(toDo: ToDoData) =
-            router.pushController(ToDoDetailController.create(toDo.uri).routerTransaction()
+    override fun pushDetailController(todo: Todo) =
+            router.pushController(DetailController.create(todo.uri).routerTransaction()
                     .pushChangeHandler(VerticalChangeHandler())
                     .popChangeHandler(FadeChangeHandler()))
 
-    private fun createViewComponent() = activity.component.toDoListComponentBuilder()
+    private fun createViewComponent() = activity.component.listComponentBuilder()
             .controllerModule(Module())
             .build()
 
     @CollectionScope
     class Adapter @Inject constructor(
-            private val mediator: ToDoListMediator,
-            private var viewHolderInjector: MembersInjector<ToDoListPresenter.ItemHolder>)
-    : RecyclerView.Adapter<ToDoListPresenter.ItemHolder>() {
+            private val mediator: ListMediator,
+            private var viewHolderInjector: MembersInjector<ListPresenter.ItemHolder>)
+    : RecyclerView.Adapter<ListPresenter.ItemHolder>() {
 
         init {
             setHasStableIds(true)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup,
-                                        viewType: Int): ToDoListPresenter.ItemHolder {
+                                        viewType: Int): ListPresenter.ItemHolder {
             val inflater = LayoutInflater.from(parent.context)
             val view = inflater.inflate(R.layout.presenter_todo_list_item, parent, false)
-            val viewHolder = ToDoListPresenter.ItemHolder(view)
+            val viewHolder = ListPresenter.ItemHolder(view)
             viewHolderInjector.injectMembers(viewHolder)
             return viewHolder
         }
 
-        override fun onBindViewHolder(holder: ToDoListPresenter.ItemHolder, position: Int) =
+        override fun onBindViewHolder(holder: ListPresenter.ItemHolder, position: Int) =
                 mediator.bindItemPresenter(holder, position)
 
-        override fun onViewRecycled(holder: ToDoListPresenter.ItemHolder) = holder.onRecycle()
+        override fun onViewRecycled(holder: ListPresenter.ItemHolder) = holder.onRecycle()
 
         override fun getItemCount() = mediator.itemCount
 
@@ -89,8 +89,8 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
      */
     @CollectionScope @Subcomponent(modules = arrayOf(Module::class))
     interface ViewComponent {
-        fun inject(presenter: ToDoListPresenter): ToDoListPresenter
-        fun mediator(): ToDoListMediator
+        fun inject(presenter: ListPresenter): ListPresenter
+        fun mediator(): ListMediator
 
         @Subcomponent.Builder
         interface Builder {
@@ -101,6 +101,6 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
 
     @dagger.Module
     inner class Module : RxControllerModule(this) {
-        @Provides fun navigator(): ToDoListMediator.Navigator = this@ToDoListController
+        @Provides fun navigator(): ListMediator.Navigator = this@ListController
     }
 }

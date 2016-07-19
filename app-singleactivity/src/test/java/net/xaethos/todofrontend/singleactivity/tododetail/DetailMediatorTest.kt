@@ -1,6 +1,6 @@
 package net.xaethos.todofrontend.singleactivity.tododetail
 
-import net.xaethos.todofrontend.datasource.ToDoData
+import net.xaethos.todofrontend.datasource.Todo
 import net.xaethos.todofrontend.singleactivity.test.mock
 import net.xaethos.todofrontend.singleactivity.test.stub
 import net.xaethos.todofrontend.singleactivity.test.withSubject
@@ -13,22 +13,22 @@ import rx.lang.kotlin.PublishSubject
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class ToDoDetailMediatorTest {
+class DetailMediatorTest {
     val uri = "http://example.com/todo/13"
-    val toDo = ToDoData(uri, "Title", "Details")
+    val todo = Todo(uri, "Title", "Details")
 
-    val mediator = ToDoDetailMediator()
+    val mediator = DetailMediator()
 
     @Before
     fun setUp() {
         mediator.dataSource = mock {
-            stub(get(uri)).withSubject(BehaviorSubject(toDo))
+            stub(get(uri)).withSubject(BehaviorSubject(todo))
         }
     }
 
     @Test
     fun bindPresenter() {
-        val presenter = mock<ToDoDetailMediator.ViewPresenter> {
+        val presenter = mock<DetailMediator.ViewPresenter> {
             stub(unbinds).thenReturn(Observable.never())
         }
 
@@ -40,7 +40,7 @@ class ToDoDetailMediatorTest {
 
     @Test
     fun bindPresenter_unsubscribesOnUnbind() {
-        val presenter = mock<ToDoDetailMediator.ViewPresenter>()
+        val presenter = mock<DetailMediator.ViewPresenter>()
         val unbindSubject = stub(presenter.unbinds).withSubject(PublishSubject())
 
         val subscription = mediator.bindPresenter(presenter, uri)

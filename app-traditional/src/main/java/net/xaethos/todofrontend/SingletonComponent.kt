@@ -7,9 +7,9 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = arrayOf(DataModule::class))
 interface SingletonComponent {
-    fun inject(activity: ToDoListActivity)
+    fun inject(activity: TodoListActivity)
 
-    fun inject(fragment: ToDoDetailFragment)
+    fun inject(fragment: TodoDetailFragment)
 }
 
 val singletonComponent: SingletonComponent = DaggerSingletonComponent.create()

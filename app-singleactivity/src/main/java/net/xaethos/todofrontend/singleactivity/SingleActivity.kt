@@ -9,8 +9,8 @@ import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Router
 import dagger.Provides
 import dagger.Subcomponent
-import net.xaethos.todofrontend.singleactivity.tododetail.ToDoDetailController
-import net.xaethos.todofrontend.singleactivity.todolist.ToDoListController
+import net.xaethos.todofrontend.singleactivity.tododetail.DetailController
+import net.xaethos.todofrontend.singleactivity.todolist.ListController
 import net.xaethos.todofrontend.singleactivity.util.bindView
 import net.xaethos.todofrontend.singleactivity.util.routerTransaction
 
@@ -29,7 +29,7 @@ class SingleActivity : AppCompatActivity() {
 
         router = Conductor.attachRouter(this, container, savedInstanceState)
         if (!router.hasRootController()) {
-            router.setRoot(ToDoListController().routerTransaction())
+            router.setRoot(ListController().routerTransaction())
         }
     }
 
@@ -39,8 +39,8 @@ class SingleActivity : AppCompatActivity() {
 
     @ActivityScope @Subcomponent(modules = arrayOf(Module::class))
     interface Component {
-        fun toDoListComponentBuilder(): ToDoListController.ViewComponent.Builder
-        fun toDoDetailComponentBuilder(): ToDoDetailController.ViewComponent.Builder
+        fun listComponentBuilder(): ListController.ViewComponent.Builder
+        fun detailComponentBuilder(): DetailController.ViewComponent.Builder
     }
 
     @dagger.Module

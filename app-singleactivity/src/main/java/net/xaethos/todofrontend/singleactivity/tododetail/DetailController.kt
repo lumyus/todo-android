@@ -16,17 +16,17 @@ import net.xaethos.todofrontend.singleactivity.util.RxControllerModule
 /**
  * Controller: lifecycle, navigation and dependency injection
  */
-class ToDoDetailController(val args: Arguments) : RxController(args.bundle) {
+class DetailController(val args: Arguments) : RxController(args.bundle) {
 
     @Suppress("unused")
     constructor(bundle: Bundle) : this(Arguments(bundle))
 
     companion object {
-        fun create(uri: String): ToDoDetailController {
-            val args = ToDoDetailController.Arguments(Bundle()).apply {
+        fun create(uri: String): DetailController {
+            val args = DetailController.Arguments(Bundle()).apply {
                 this.uri = uri
             }
-            return ToDoDetailController(args)
+            return DetailController(args)
         }
     }
 
@@ -37,7 +37,7 @@ class ToDoDetailController(val args: Arguments) : RxController(args.bundle) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         val viewComponent = createViewComponent()
         val view = inflater.inflate(R.layout.presenter_todo_detail, container, false)
-        val presenter = viewComponent.inject(ToDoDetailPresenter(view))
+        val presenter = viewComponent.inject(DetailPresenter(view))
         val mediator = viewComponent.mediator()
 
         mediator.bindPresenter(presenter, args.uri!!)
@@ -52,7 +52,7 @@ class ToDoDetailController(val args: Arguments) : RxController(args.bundle) {
         return true
     }
 
-    private fun createViewComponent() = activity.component.toDoDetailComponentBuilder()
+    private fun createViewComponent() = activity.component.detailComponentBuilder()
             .controllerModule(RxControllerModule(this))
             .build()
 
@@ -62,8 +62,8 @@ class ToDoDetailController(val args: Arguments) : RxController(args.bundle) {
 
     @ItemScope @Subcomponent(modules = arrayOf(RxControllerModule::class))
     interface ViewComponent {
-        fun inject(viewHolder: ToDoDetailPresenter): ToDoDetailPresenter
-        fun mediator(): ToDoDetailMediator
+        fun inject(viewHolder: DetailPresenter): DetailPresenter
+        fun mediator(): DetailMediator
 
         @Subcomponent.Builder
         interface Builder {

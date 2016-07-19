@@ -12,9 +12,9 @@ import kotlin.test.assertNotEquals
 class ModuleDataSourceTest {
 
     val seededItems = listOf(
-            ToDoData(uri = "todo/1", title = "Give a talk on To Do app"),
-            ToDoData(uri = "todo/2", title = "Do stuff", details = "I have stuff to do"),
-            ToDoData(uri = "todo/0", title = "Write To Do app", completed = true)
+            Todo(uri = "todo/1", title = "Give a talk on To Do app"),
+            Todo(uri = "todo/2", title = "Do stuff", details = "I have stuff to do"),
+            Todo(uri = "todo/0", title = "Write To Do app", completed = true)
     )
 
     val dataSource = DataModule().dataSource()
@@ -63,7 +63,7 @@ class ModuleDataSourceTest {
             val createdItem = subscriber.onNextEvents.single()
 
             createdItem shouldEqual
-                    ToDoData(createdItem.uri, "new title", "details", completed = false)
+                    Todo(createdItem.uri, "new title", "details", completed = false)
         }
     }
 
@@ -88,7 +88,7 @@ class ModuleDataSourceTest {
 
     @Test
     fun put_whenExistingUri_updatesItemInPlace() {
-        val updatedItem = ToDoData(uri = "todo/1", title = "Give a talk on application testing")
+        val updatedItem = Todo(uri = "todo/1", title = "Give a talk on application testing")
         dataSource.put(updatedItem)
         dataSource.all shouldMatch emits(listOf(
                 updatedItem,
@@ -136,7 +136,7 @@ class ModuleDataSourceTest {
 
     @Test
     fun put_whenNewUri_insertsBeforeCompleted() {
-        val newItem = ToDoData(uri = "todo/new", title = "another to do")
+        val newItem = Todo(uri = "todo/new", title = "another to do")
         dataSource.put(newItem)
         dataSource.all shouldMatch emits(listOf(
                 seededItems[0],
@@ -148,7 +148,7 @@ class ModuleDataSourceTest {
 
     @Test
     fun put_whenNewUri_andCompleted_insertsAtEnd() {
-        val newItem = ToDoData(uri = "todo/new", title = "completed to do", completed = true)
+        val newItem = Todo(uri = "todo/new", title = "completed to do", completed = true)
         dataSource.put(newItem)
         dataSource.all shouldMatch emits(listOf(
                 seededItems[0],

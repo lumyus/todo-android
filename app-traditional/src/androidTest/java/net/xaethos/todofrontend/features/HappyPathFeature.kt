@@ -4,12 +4,14 @@ import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.RecyclerViewActions
-import android.support.test.espresso.matcher.ViewMatchers.*
+import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
+import android.support.test.espresso.matcher.ViewMatchers.withId
+import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
 import android.support.v7.widget.RecyclerView
 import net.xaethos.todofrontend.R
-import net.xaethos.todofrontend.ToDoListActivity
+import net.xaethos.todofrontend.TodoListActivity
 import net.xaethos.todofrontend.test.activityTestRule
 import org.hamcrest.Matchers.containsString
 import org.junit.Rule
@@ -20,9 +22,9 @@ import org.junit.runner.RunWith
 @LargeTest
 class HappyPathFeature {
 
-    @get:Rule var activityRule = activityTestRule<ToDoListActivity>()
+    @get:Rule var activityRule = activityTestRule<TodoListActivity>()
 
-    @Test fun seeToDoDetails() {
+    @Test fun seeTodoDetails() {
         // Scroll down list and tap on to do
         onView(withId(R.id.todo_list))
                 .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(1))
