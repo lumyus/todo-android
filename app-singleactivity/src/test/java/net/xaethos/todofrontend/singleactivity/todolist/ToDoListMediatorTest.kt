@@ -9,12 +9,9 @@ import net.xaethos.todofrontend.singleactivity.test.stub
 import net.xaethos.todofrontend.singleactivity.test.withSubject
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
-import rx.Observable
 import rx.lang.kotlin.BehaviorSubject
 import rx.lang.kotlin.PublishSubject
-import rx.lang.kotlin.toSingletonObservable
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -28,18 +25,21 @@ class ToDoListMediatorTest {
             todo(3)
     )
 
+    val dataSubject = BehaviorSubject(data)
     val clickSubject = PublishSubject<Unit>()
+    val checkedSubject = PublishSubject<Boolean>()
     val unbindSubject = PublishSubject<Unit>()
 
     val navigator: ToDoListMediator.Navigator = mock()
     val dataSource: ToDoDataSource = mock {
-        stub(all).withSubject(BehaviorSubject(data))
+        stub(all).withSubject(dataSubject)
     }
     val listPresenter: ToDoListMediator.ListPresenter = mock {
         stub(unbinds).withSubject(unbindSubject)
     }
     val itemPresenter: ToDoListMediator.ItemPresenter = mock {
         stub(clicks).withSubject(clickSubject)
+        stub(checkedChanges).withSubject(checkedSubject)
         stub(unbinds).withSubject(unbindSubject)
     }
 
@@ -69,35 +69,41 @@ class ToDoListMediatorTest {
 
     @Test
     fun bindItemPresenter() {
-        mediator.toDos = data
+        mediator.toDos = listOf(
+                ToDoData("todo/10", "title", completed = true),
+                ToDoData("todo/1", "To Do 1")
+        )
+
+        mediator.bindItemPresenter(itemPresenter, 0)
+        verify(itemPresenter).titleText = "title"
+        verify(itemPresenter).urlText = "todo/10"
+        verify(itemPresenter).isChecked = true
+
         mediator.bindItemPresenter(itemPresenter, 1)
-
         verify(itemPresenter).titleText = "To Do 1"
-        verify(itemPresenter).urlText = "http://example.com/todo/1"
-    }
-
-    @Test
-    fun bindItemPresenter_unsubscribesOnUnbind() {
-        mediator.toDos = data
-
-        val subscription = mediator.bindItemPresenter(itemPresenter, 1)
-        assertFalse(subscription.isUnsubscribed)
-
-        unbindSubject.onNext(Unit)
-        assertTrue(subscription.isUnsubscribed)
+        verify(itemPresenter).urlText = "todo/1"
+        verify(itemPresenter).isChecked = false
     }
 
     @Test
     fun onItemClick_showDetails() {
-        val presenter: ToDoListMediator.ItemPresenter = mock {
-            `when`(clicks).thenReturn(Unit.toSingletonObservable())
-            `when`(unbinds).thenReturn(Observable.never())
-        }
-
         mediator.toDos = data
-        mediator.bindItemPresenter(presenter, 2)
+        mediator.bindItemPresenter(itemPresenter, 2)
+
+        clickSubject.onNext(Unit)
 
         verify(navigator).pushDetailController(data[2])
+    }
+
+    @Test
+    fun onItemChecked_updateData() {
+        val item = ToDoData("todo/13", "doable")
+        mediator.toDos = listOf(item)
+        mediator.bindItemPresenter(itemPresenter, 0)
+
+        checkedSubject.onNext(true)
+
+        verify(dataSource).put(item.copy(completed = true))
     }
 
     @Test

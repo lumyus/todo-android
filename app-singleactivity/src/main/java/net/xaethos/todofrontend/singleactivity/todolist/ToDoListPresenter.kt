@@ -3,14 +3,13 @@ package net.xaethos.todofrontend.singleactivity.todolist
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.view.View
+import android.widget.CheckBox
 import android.widget.TextView
 import com.jakewharton.rxbinding.view.clicks
+import com.jakewharton.rxbinding.widget.checkedChanges
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.SingleActivity
-import net.xaethos.todofrontend.singleactivity.util.Presenter
-import net.xaethos.todofrontend.singleactivity.util.ViewHolderPresenter
-import net.xaethos.todofrontend.singleactivity.util.bindView
-import net.xaethos.todofrontend.singleactivity.util.textViewText
+import net.xaethos.todofrontend.singleactivity.util.*
 import rx.Observable
 import javax.inject.Inject
 
@@ -43,13 +42,16 @@ class ToDoListPresenter(override val root: View) : Presenter, ToDoListMediator.L
     override fun notifyDataSetChanged() = adapter.notifyDataSetChanged()
 
     class ItemHolder(view: View) : ViewHolderPresenter(view), ToDoListMediator.ItemPresenter {
-        private val idView: TextView by bindView(R.id.id)
-        private val contentView: TextView by bindView(R.id.content)
+        private val titleView: TextView by bindView(R.id.text_title)
+        private val uriView: TextView by bindView(R.id.text_uri)
+        private val completedView: CheckBox by bindView(R.id.chk_completed)
 
-        override var urlText by textViewText(idView)
-        override var titleText by textViewText(contentView)
+        override var titleText by textViewText(titleView)
+        override var urlText by textViewText(uriView)
+        override var isChecked by compoundButtonChecked(completedView)
 
         override val clicks: Observable<Unit> = root.clicks()
+        override val checkedChanges: Observable<Boolean> = completedView.checkedChanges()
 
         @Inject override lateinit var controllerUnbinds: Observable<Unit>
     }

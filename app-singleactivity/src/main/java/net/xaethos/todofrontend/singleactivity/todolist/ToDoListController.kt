@@ -71,9 +71,8 @@ class ToDoListController() : RxController(), ToDoListMediator.Navigator {
             return viewHolder
         }
 
-        override fun onBindViewHolder(holder: ToDoListPresenter.ItemHolder, position: Int) {
-            mediator.bindItemPresenter(holder, position)
-        }
+        override fun onBindViewHolder(holder: ToDoListPresenter.ItemHolder, position: Int) =
+                mediator.bindItemPresenter(holder, position)
 
         override fun onViewRecycled(holder: ToDoListPresenter.ItemHolder) = holder.onRecycle()
 

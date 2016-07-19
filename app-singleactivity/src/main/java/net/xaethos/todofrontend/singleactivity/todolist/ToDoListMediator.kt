@@ -7,7 +7,6 @@ import net.xaethos.todofrontend.singleactivity.CollectionScope
 import net.xaethos.todofrontend.singleactivity.util.Logger
 import net.xaethos.todofrontend.singleactivity.util.Presenter
 import rx.Observable
-import rx.Subscription
 import rx.lang.kotlin.subscribeWith
 import javax.inject.Inject
 
@@ -34,18 +33,22 @@ class ToDoListMediator @Inject constructor(val navigator: Navigator) {
                 }
             }
 
-    fun bindItemPresenter(presenter: ItemPresenter, position: Int): Subscription {
+    fun bindItemPresenter(presenter: ItemPresenter, position: Int) {
         // First get the data to bind to
         val toDo = toDos[position]
 
         // We now set the state of the presenter to reflect its position
         presenter.titleText = toDo.title
         presenter.urlText = toDo.uri
+        presenter.isChecked = toDo.completed
 
         // Finally, we subscribe to UI events
-        return presenter.clicks.takeUntil(presenter.unbinds).subscribeWith {
+        presenter.clicks.takeUntil(presenter.unbinds).subscribeWith {
             onNext { navigator.pushDetailController(toDo) }
             onError { logger.warn(it) }
+        }
+        presenter.checkedChanges.takeUntil(presenter.unbinds).subscribe { checked ->
+            dataSource.put(toDo.copy(completed = checked))
         }
     }
 
@@ -75,10 +78,12 @@ class ToDoListMediator @Inject constructor(val navigator: Navigator) {
          */
         var titleText: CharSequence?
         var urlText: CharSequence?
+        var isChecked: Boolean
 
         /*
         These are the presenters event emitters.
          */
         val clicks: Observable<Unit>
+        val checkedChanges: Observable<Boolean>
     }
 }
