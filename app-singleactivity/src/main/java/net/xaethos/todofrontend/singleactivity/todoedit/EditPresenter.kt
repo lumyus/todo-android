@@ -9,7 +9,7 @@ import com.jakewharton.rxbinding.view.clicks
 import com.jakewharton.rxbinding.widget.textChanges
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.SingleActivity
-import net.xaethos.todofrontend.singleactivity.util.Presenter
+import net.xaethos.todofrontend.singleactivity.util.ViewPresenter
 import net.xaethos.todofrontend.singleactivity.util.bindView
 import net.xaethos.todofrontend.singleactivity.util.textViewText
 import net.xaethos.todofrontend.singleactivity.util.viewEnabled
@@ -19,7 +19,7 @@ import javax.inject.Inject
 /**
  * View presenter: UI controls and events
  */
-class EditPresenter(override val root: View) : Presenter, EditMediator.ViewPresenter {
+class EditPresenter(override val root: View) : ViewPresenter, EditMediator.Presenter {
     private val appBarLayout: CollapsingToolbarLayout by bindView(R.id.toolbar_layout)
     private val toolbar: Toolbar by bindView(R.id.detail_toolbar)
     private val titleField: EditText by bindView(R.id.todo_title)
@@ -37,13 +37,13 @@ class EditPresenter(override val root: View) : Presenter, EditMediator.ViewPrese
     override var fabEnabled by viewEnabled(fab)
 
     override val titleChanges: Observable<CharSequence>
-        get() = titleField.textChanges().takeUntil(unbinds)
+        get() = titleField.textChanges().takeUntil(detaches)
     override val detailsChanges: Observable<CharSequence>
-        get() = detailsField.textChanges().takeUntil(unbinds)
+        get() = detailsField.textChanges().takeUntil(detaches)
     override val fabClicks: Observable<Unit>
-        get() = fab.clicks().takeUntil(unbinds)
+        get() = fab.clicks().takeUntil(detaches)
 
-    @Inject override lateinit var unbinds: Observable<Unit>
+    @Inject override lateinit var detaches: Observable<Unit>
 
     @Inject
     fun setUp(activity: SingleActivity) {

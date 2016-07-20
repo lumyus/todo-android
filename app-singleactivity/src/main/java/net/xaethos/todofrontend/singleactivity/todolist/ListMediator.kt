@@ -3,9 +3,9 @@ package net.xaethos.todofrontend.singleactivity.todolist
 import android.support.annotation.VisibleForTesting
 import net.xaethos.todofrontend.datasource.Todo
 import net.xaethos.todofrontend.datasource.TodoDataSource
-import net.xaethos.todofrontend.singleactivity.CollectionScope
+import net.xaethos.todofrontend.singleactivity.ControllerScope
 import net.xaethos.todofrontend.singleactivity.util.Logger
-import net.xaethos.todofrontend.singleactivity.util.Presenter
+import net.xaethos.todofrontend.singleactivity.util.ViewPresenter
 import rx.Observable
 import rx.lang.kotlin.subscribeWith
 import javax.inject.Inject
@@ -13,7 +13,7 @@ import javax.inject.Inject
 /**
  * Mediator: All business logic goes here
  */
-@CollectionScope
+@ControllerScope
 class ListMediator @Inject constructor(val navigator: Navigator) {
     @Inject lateinit var dataSource: TodoDataSource
     @Inject lateinit var logger: Logger
@@ -26,7 +26,7 @@ class ListMediator @Inject constructor(val navigator: Navigator) {
     fun itemId(index: Int): Long = todoList[index].uri.hashCode().toLong()
 
     fun bindListPresenter(presenter: ListPresenter) {
-        dataSource.all.takeUntil(presenter.unbinds).subscribe { newItems ->
+        dataSource.all.takeUntil(presenter.detaches).subscribe { newItems ->
             todoList = newItems
             presenter.notifyDataSetChanged()
         }
@@ -48,7 +48,7 @@ class ListMediator @Inject constructor(val navigator: Navigator) {
             onNext { navigator.pushDetailController(todo) }
             onError { logger.warn(it) }
         }
-        presenter.checkedChanges.takeUntil(presenter.unbinds).subscribe { checked ->
+        presenter.checkedChanges.takeUntil(presenter.detaches).subscribe { checked ->
             dataSource.put(todo.copy(completed = checked))
         }
     }
@@ -65,7 +65,7 @@ class ListMediator @Inject constructor(val navigator: Navigator) {
         fun pushCreateController()
     }
 
-    interface ListPresenter : Presenter {
+    interface ListPresenter : ViewPresenter {
         fun notifyDataSetChanged()
         val fabClicks: Observable<Unit>
     }
@@ -74,7 +74,7 @@ class ListMediator @Inject constructor(val navigator: Navigator) {
      * The presenter interfaces are what the mediator needs to control and react to the UI. The
      * exact view structure is not important as long as these methods are available.
      */
-    interface ItemPresenter : Presenter {
+    interface ItemPresenter : ViewPresenter {
         /*
         These are the presenters "controls." They let us check and modify
         its state.

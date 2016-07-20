@@ -5,18 +5,18 @@ import android.view.View
 import rx.Observable
 import rx.lang.kotlin.PublishSubject
 
-interface Presenter {
+interface ViewPresenter {
     val root: View
 
-    val unbinds: Observable<Unit>
+    val detaches: Observable<Unit>
 }
 
-abstract class ViewHolderPresenter(override val root: View) : RecyclerView.ViewHolder(root), Presenter {
+abstract class ViewHolderPresenter(override val root: View) : RecyclerView.ViewHolder(root), ViewPresenter {
 
-    abstract val controllerUnbinds: Observable<Unit>
+    abstract val controllerDetaches: Observable<Unit>
 
-    override val unbinds: Observable<Unit>
-        get() = controllerUnbinds.mergeWith(recycleSubject.asObservable()).first()
+    override val detaches: Observable<Unit>
+        get() = controllerDetaches.mergeWith(recycleSubject.asObservable()).first()
 
     private val recycleSubject = PublishSubject<Unit>()
 

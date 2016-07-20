@@ -10,7 +10,7 @@ import com.bluelinelabs.conductor.rxlifecycle.RxController
 import dagger.Provides
 import dagger.Subcomponent
 import net.xaethos.todofrontend.datasource.Todo
-import net.xaethos.todofrontend.singleactivity.ItemScope
+import net.xaethos.todofrontend.singleactivity.ControllerScope
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.component
 import net.xaethos.todofrontend.singleactivity.todoedit.EditController
@@ -39,14 +39,16 @@ class DetailController(val args: Arguments) : RxController(args.bundle), DetailM
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
-        val viewComponent = createViewComponent()
-        val view = inflater.inflate(R.layout.presenter_todo_detail, container, false)
-        val presenter = viewComponent.inject(DetailPresenter(view))
-        val mediator = viewComponent.mediator()
+    val viewComponent by lazy {
+        activity.component.detailComponentBuilder().controllerModule(Module()).build()
+    }
 
-        mediator.bindPresenter(presenter, args.uri!!)
-        return presenter.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View =
+            inflater.inflate(R.layout.presenter_todo_detail, container, false)
+
+    override fun onAttach(view: View) {
+        val presenter = viewComponent.inject(DetailPresenter(view))
+        viewComponent.mediator().bindPresenter(presenter, args.uri!!)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -62,15 +64,11 @@ class DetailController(val args: Arguments) : RxController(args.bundle), DetailM
                     .pushChangeHandler(FadeChangeHandler())
                     .popChangeHandler(FadeChangeHandler()))
 
-    private fun createViewComponent() = activity.component.detailComponentBuilder()
-            .controllerModule(Module())
-            .build()
-
     class Arguments(bundle: Bundle) : DataBundle(bundle) {
         var uri by bundleString
     }
 
-    @ItemScope @Subcomponent(modules = arrayOf(Module::class))
+    @ControllerScope @Subcomponent(modules = arrayOf(Module::class))
     interface ViewComponent {
         fun inject(viewHolder: DetailPresenter): DetailPresenter
         fun mediator(): DetailMediator

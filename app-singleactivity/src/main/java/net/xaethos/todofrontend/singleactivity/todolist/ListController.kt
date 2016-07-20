@@ -12,7 +12,7 @@ import dagger.MembersInjector
 import dagger.Provides
 import dagger.Subcomponent
 import net.xaethos.todofrontend.datasource.Todo
-import net.xaethos.todofrontend.singleactivity.CollectionScope
+import net.xaethos.todofrontend.singleactivity.ControllerScope
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.component
 import net.xaethos.todofrontend.singleactivity.tododetail.DetailController
@@ -35,14 +35,16 @@ import javax.inject.Inject
  * Finally, controllers handle dependency injection for mediators and presenters.
  */
 class ListController() : RxController(), ListMediator.Navigator {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
-        val viewComponent = createViewComponent()
-        val view = inflater.inflate(R.layout.presenter_todo_list, container, false)
-        val presenter = viewComponent.inject(ListPresenter(view))
-        val mediator = viewComponent.mediator()
+    val viewComponent by lazy {
+        activity.component.listComponentBuilder().controllerModule(Module()).build()
+    }
 
-        mediator.bindListPresenter(presenter)
-        return presenter.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View =
+            inflater.inflate(R.layout.presenter_todo_list, container, false)
+
+    override fun onAttach(view: View) {
+        val presenter = viewComponent.inject(ListPresenter(view))
+        viewComponent.mediator().bindListPresenter(presenter)
     }
 
     override fun pushDetailController(todo: Todo) =
@@ -55,11 +57,7 @@ class ListController() : RxController(), ListMediator.Navigator {
                     .pushChangeHandler(VerticalChangeHandler())
                     .popChangeHandler(FadeChangeHandler()))
 
-    private fun createViewComponent() = activity.component.listComponentBuilder()
-            .controllerModule(Module())
-            .build()
-
-    @CollectionScope
+    @ControllerScope
     class Adapter @Inject constructor(
             private val mediator: ListMediator,
             private var viewHolderInjector: MembersInjector<ListPresenter.ItemHolder>)
@@ -94,7 +92,7 @@ class ListController() : RxController(), ListMediator.Navigator {
      * Its lifecycle should match the _view's_ lifecycle: we should create a new
      * `ViewComponent` instance on each `onCreateView`.
      */
-    @CollectionScope @Subcomponent(modules = arrayOf(Module::class))
+    @ControllerScope @Subcomponent(modules = arrayOf(Module::class))
     interface ViewComponent {
         fun inject(presenter: ListPresenter): ListPresenter
         fun mediator(): ListMediator

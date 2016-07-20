@@ -11,8 +11,8 @@ import com.jakewharton.rxbinding.view.clicks
 import com.jakewharton.rxbinding.widget.checkedChanges
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.SingleActivity
-import net.xaethos.todofrontend.singleactivity.util.Presenter
 import net.xaethos.todofrontend.singleactivity.util.ViewHolderPresenter
+import net.xaethos.todofrontend.singleactivity.util.ViewPresenter
 import net.xaethos.todofrontend.singleactivity.util.bindView
 import net.xaethos.todofrontend.singleactivity.util.textViewText
 import rx.Observable
@@ -30,16 +30,16 @@ import javax.inject.Inject
  * references at once. If we were to use [bindView] directly on the controller,
  * a second call to [Controller.onCreateView] wouldn't reinitialize the bindings.
  */
-class ListPresenter(override val root: View) : Presenter, ListMediator.ListPresenter {
+class ListPresenter(override val root: View) : ViewPresenter, ListMediator.ListPresenter {
     private val toolbar by bindView<Toolbar>(R.id.toolbar)
     private val listView by bindView<RecyclerView>(R.id.todo_list)
     private val fab: FloatingActionButton by bindView(R.id.fab)
 
     override val fabClicks: Observable<Unit>
-        get() = fab.clicks().takeUntil(unbinds)
+        get() = fab.clicks().takeUntil(detaches)
 
     @Inject lateinit var adapter: ListController.Adapter
-    @Inject override lateinit var unbinds: Observable<Unit>
+    @Inject override lateinit var detaches: Observable<Unit>
 
     @Inject
     fun setUp(activity: SingleActivity) {
@@ -69,10 +69,10 @@ class ListPresenter(override val root: View) : Presenter, ListMediator.ListPrese
             }
 
         override val clicks: Observable<Unit>
-            get() = root.clicks().takeUntil(unbinds)
+            get() = root.clicks().takeUntil(detaches)
         override val checkedChanges: Observable<Boolean>
-            get() = completedView.checkedChanges().takeUntil(unbinds)
+            get() = completedView.checkedChanges().takeUntil(detaches)
 
-        @Inject override lateinit var controllerUnbinds: Observable<Unit>
+        @Inject override lateinit var controllerDetaches: Observable<Unit>
     }
 }

@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import com.bluelinelabs.conductor.rxlifecycle.RxController
 import dagger.Provides
 import dagger.Subcomponent
-import net.xaethos.todofrontend.singleactivity.ItemScope
+import net.xaethos.todofrontend.singleactivity.ControllerScope
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.component
 import net.xaethos.todofrontend.singleactivity.util.DataBundle
@@ -35,14 +35,16 @@ class EditController(val args: Arguments) : RxController(args.bundle), EditMedia
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
-        val viewComponent = createViewComponent()
-        val view = inflater.inflate(R.layout.presenter_todo_edit, container, false)
-        val presenter = viewComponent.inject(EditPresenter(view))
-        val mediator = viewComponent.mediator()
+    val viewComponent by lazy {
+        activity.component.editComponentBuilder().controllerModule(Module()).build()
+    }
 
-        mediator.bindPresenter(presenter, args.uri)
-        return presenter.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View =
+            inflater.inflate(R.layout.presenter_todo_edit, container, false)
+
+    override fun onAttach(view: View) {
+        val presenter = viewComponent.inject(EditPresenter(view))
+        viewComponent.mediator().bindPresenter(presenter, args.uri)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -57,15 +59,11 @@ class EditController(val args: Arguments) : RxController(args.bundle), EditMedia
         router.popCurrentController()
     }
 
-    private fun createViewComponent() = activity.component.editComponentBuilder()
-            .controllerModule(Module())
-            .build()
-
     class Arguments(bundle: Bundle) : DataBundle(bundle) {
         var uri by bundleString
     }
 
-    @ItemScope @Subcomponent(modules = arrayOf(Module::class))
+    @ControllerScope @Subcomponent(modules = arrayOf(Module::class))
     interface ViewComponent {
         fun inject(viewHolder: EditPresenter): EditPresenter
         fun mediator(): EditMediator

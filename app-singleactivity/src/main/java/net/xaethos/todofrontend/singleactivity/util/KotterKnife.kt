@@ -12,7 +12,7 @@ import android.support.v4.app.Fragment as SupportFragment
 fun <V : View> View.bindView(id: Int): ReadOnlyProperty<View, V> = required(id, viewFinder)
 fun <V : View> Activity.bindView(id: Int): ReadOnlyProperty<Activity, V> = required(id, viewFinder)
 fun <V : View> Dialog.bindView(id: Int): ReadOnlyProperty<Dialog, V> = required(id, viewFinder)
-fun <V : View> Presenter.bindView(id: Int): ReadOnlyProperty<Presenter, V> =
+fun <V : View> ViewPresenter.bindView(id: Int): ReadOnlyProperty<ViewPresenter, V> =
         required(id, viewFinder)
 
 fun <V : View> View.bindOptionalView(id: Int): ReadOnlyProperty<View, V?> = optional(id, viewFinder)
@@ -46,7 +46,7 @@ private val Activity.viewFinder: Activity.(Int) -> View?
     get() = { findViewById(it) }
 private val Dialog.viewFinder: Dialog.(Int) -> View?
     get() = { findViewById(it) }
-private val Presenter.viewFinder: Presenter.(Int) -> View?
+private val ViewPresenter.viewFinder: ViewPresenter.(Int) -> View?
     get() = { root.findViewById(it) }
 
 private fun viewNotFound(id: Int, desc: KProperty<*>): Nothing =

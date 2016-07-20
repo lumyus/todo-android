@@ -12,9 +12,9 @@ fun Controller.routerTransaction(): RouterTransaction = RouterTransaction.with(t
 
 @Module
 open class RxControllerModule(val controller: RxController) {
-    @Provides fun viewDestroyedObservable(): Observable<Unit> {
+    @Provides fun controllerDetachesObservable(): Observable<Unit> {
         return controller.lifecycle()
-                .takeFirst { it == ControllerEvent.DESTROY_VIEW }
+                .filter { it == ControllerEvent.DETACH }
                 .map { Unit }
     }
 }

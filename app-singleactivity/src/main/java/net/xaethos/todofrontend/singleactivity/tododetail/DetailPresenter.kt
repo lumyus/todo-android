@@ -8,7 +8,7 @@ import android.widget.TextView
 import com.jakewharton.rxbinding.view.clicks
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.SingleActivity
-import net.xaethos.todofrontend.singleactivity.util.Presenter
+import net.xaethos.todofrontend.singleactivity.util.ViewPresenter
 import net.xaethos.todofrontend.singleactivity.util.bindView
 import net.xaethos.todofrontend.singleactivity.util.textViewText
 import rx.Observable
@@ -17,7 +17,7 @@ import javax.inject.Inject
 /**
  * View presenter: UI controls and events
  */
-class DetailPresenter(override val root: View) : Presenter, DetailMediator.ViewPresenter {
+class DetailPresenter(override val root: View) : ViewPresenter, DetailMediator.Presenter {
     private val appBarLayout: CollapsingToolbarLayout by bindView(R.id.toolbar_layout)
     private val toolbar: Toolbar by bindView(R.id.detail_toolbar)
     private val detailView: TextView by bindView(R.id.todo_detail)
@@ -32,9 +32,9 @@ class DetailPresenter(override val root: View) : Presenter, DetailMediator.ViewP
     override var detailsText by textViewText(detailView)
 
     override val fabClicks: Observable<Unit>
-        get() = fab.clicks().takeUntil(unbinds)
+        get() = fab.clicks().takeUntil(detaches)
 
-    @Inject override lateinit var unbinds: Observable<Unit>
+    @Inject override lateinit var detaches: Observable<Unit>
 
     @Inject
     fun setUp(activity: SingleActivity) {

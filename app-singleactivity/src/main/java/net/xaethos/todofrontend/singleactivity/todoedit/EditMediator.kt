@@ -2,8 +2,8 @@ package net.xaethos.todofrontend.singleactivity.todoedit
 
 import net.xaethos.todofrontend.datasource.Todo
 import net.xaethos.todofrontend.datasource.TodoDataSource
-import net.xaethos.todofrontend.singleactivity.ItemScope
-import net.xaethos.todofrontend.singleactivity.util.Presenter
+import net.xaethos.todofrontend.singleactivity.ControllerScope
+import net.xaethos.todofrontend.singleactivity.util.ViewPresenter
 import rx.Observable
 import rx.lang.kotlin.subscribeWith
 import javax.inject.Inject
@@ -11,7 +11,7 @@ import javax.inject.Inject
 /**
  * Mediator: uses business logic to binding data to views
  */
-@ItemScope
+@ControllerScope
 class EditMediator @Inject constructor(val navigator: Navigator) {
     @Inject lateinit var dataSource: TodoDataSource
 
@@ -19,17 +19,17 @@ class EditMediator @Inject constructor(val navigator: Navigator) {
     var titleValue: String = ""
     var detailsValue: String = ""
 
-    fun bindPresenter(presenter: ViewPresenter, uri: String?) =
+    fun bindPresenter(presenter: Presenter, uri: String?) =
             if (uri == null) bindForCreate(presenter) else bindForEdit(presenter, uri)
 
-    private fun bindForCreate(presenter: ViewPresenter) {
+    private fun bindForCreate(presenter: Presenter) {
         presenter.appBarTitle = "New todo"
         bindFields(presenter)
     }
 
-    private fun bindForEdit(presenter: ViewPresenter, uri: String) {
+    private fun bindForEdit(presenter: Presenter, uri: String) {
         presenter.appBarTitle = "Edit todo"
-        dataSource[uri].first().takeUntil(presenter.unbinds).subscribeWith {
+        dataSource[uri].takeUntil(presenter.detaches).first().subscribeWith {
             onNext { todo ->
                 originalTodo = todo
                 presenter.titleText = todo.title
@@ -39,7 +39,7 @@ class EditMediator @Inject constructor(val navigator: Navigator) {
         }
     }
 
-    private fun bindFields(presenter: ViewPresenter) {
+    private fun bindFields(presenter: Presenter) {
         presenter.fabEnabled = !presenter.titleText.isNullOrBlank()
 
         presenter.titleChanges
@@ -71,7 +71,7 @@ class EditMediator @Inject constructor(val navigator: Navigator) {
         fun navigateBack()
     }
 
-    interface ViewPresenter : Presenter {
+    interface Presenter : ViewPresenter {
         var appBarTitle: CharSequence?
 
         var titleText: CharSequence?

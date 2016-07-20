@@ -10,14 +10,20 @@ import org.mockito.Mockito.verify
 import rx.Observable
 import rx.lang.kotlin.BehaviorSubject
 import rx.lang.kotlin.PublishSubject
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 class DetailMediatorTest {
     val uri = "http://example.com/todo/13"
     val todo = Todo(uri, "Title", "Details")
 
-    val mediator = DetailMediator()
+    val fabClickSubject = PublishSubject<Unit>()
+
+    val presenter = mock<DetailMediator.Presenter> {
+        stub(fabClicks).withSubject(fabClickSubject)
+        stub(detaches).thenReturn(Observable.never())
+    }
+
+    val navigator = mock<DetailMediator.Navigator>()
+    val mediator = DetailMediator(navigator)
 
     @Before
     fun setUp() {
@@ -28,10 +34,6 @@ class DetailMediatorTest {
 
     @Test
     fun bindPresenter() {
-        val presenter = mock<DetailMediator.ViewPresenter> {
-            stub(unbinds).thenReturn(Observable.never())
-        }
-
         mediator.bindPresenter(presenter, uri)
 
         verify(presenter).titleText = "Title"
@@ -39,14 +41,9 @@ class DetailMediatorTest {
     }
 
     @Test
-    fun bindPresenter_unsubscribesOnUnbind() {
-        val presenter = mock<DetailMediator.ViewPresenter>()
-        val unbindSubject = stub(presenter.unbinds).withSubject(PublishSubject())
-
-        val subscription = mediator.bindPresenter(presenter, uri)
-        assertFalse(subscription.isUnsubscribed)
-
-        unbindSubject.onNext(Unit)
-        assertTrue(subscription.isUnsubscribed)
+    fun onFabClick_editTodo() {
+        mediator.bindPresenter(presenter, uri)
+        fabClickSubject.onNext(Unit)
+        verify(navigator).pushEditController(todo)
     }
 }

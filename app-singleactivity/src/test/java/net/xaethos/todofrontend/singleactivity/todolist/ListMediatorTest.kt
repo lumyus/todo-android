@@ -23,22 +23,22 @@ class ListMediatorTest {
             todo(3)
     )
 
-    val dataSubject = BehaviorSubject(data)
+    val fabClickSubject = PublishSubject<Unit>()
     val clickSubject = PublishSubject<Unit>()
     val checkedSubject = PublishSubject<Boolean>()
-    val unbindSubject = PublishSubject<Unit>()
 
     val navigator: ListMediator.Navigator = mock()
     val dataSource: TodoDataSource = mock {
-        stub(all).withSubject(dataSubject)
+        stub(all).withSubject(BehaviorSubject(data))
     }
     val listPresenter: ListMediator.ListPresenter = mock {
-        stub(unbinds).withSubject(unbindSubject)
+        stub(fabClicks).withSubject(fabClickSubject)
+        stub(detaches).withSubject(PublishSubject<Unit>())
     }
     val itemPresenter: ListMediator.ItemPresenter = mock {
         stub(clicks).withSubject(clickSubject)
         stub(checkedChanges).withSubject(checkedSubject)
-        stub(unbinds).withSubject(unbindSubject)
+        stub(detaches).withSubject(PublishSubject<Unit>())
     }
 
     val mediator = ListMediator(navigator)
@@ -93,6 +93,13 @@ class ListMediatorTest {
         checkedSubject.onNext(true)
 
         verify(dataSource).put(item.copy(completed = true))
+    }
+
+    @Test
+    fun onFabClick_showCreate() {
+        mediator.bindListPresenter(listPresenter)
+        fabClickSubject.onNext(Unit)
+        verify(navigator).pushCreateController()
     }
 
     @Test
