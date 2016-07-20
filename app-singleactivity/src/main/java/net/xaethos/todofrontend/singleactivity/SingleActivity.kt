@@ -17,15 +17,13 @@ import net.xaethos.todofrontend.singleactivity.util.routerTransaction
 
 class SingleActivity : AppCompatActivity() {
 
-    val container by bindView<ViewGroup>(R.id.controller_container)
+    val container by bindView<ViewGroup>(android.R.id.content)
 
     lateinit var router: Router
     lateinit var component: Component
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_single)
-
         component = singletonComponent.activityComponent(Module())
 
         router = Conductor.attachRouter(this, container, savedInstanceState)
