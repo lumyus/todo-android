@@ -5,23 +5,18 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
 import com.bluelinelabs.conductor.rxlifecycle.RxController
-import dagger.Provides
 import dagger.Subcomponent
-import net.xaethos.todofrontend.datasource.Todo
 import net.xaethos.todofrontend.singleactivity.ControllerScope
 import net.xaethos.todofrontend.singleactivity.R
 import net.xaethos.todofrontend.singleactivity.component
-import net.xaethos.todofrontend.singleactivity.todoedit.EditController
 import net.xaethos.todofrontend.singleactivity.util.DataBundle
 import net.xaethos.todofrontend.singleactivity.util.RxControllerModule
-import net.xaethos.todofrontend.singleactivity.util.routerTransaction
 
 /**
  * Controller: lifecycle, navigation and dependency injection
  */
-class DetailController(val args: Arguments) : RxController(args.bundle), DetailMediator.Navigator {
+class DetailController(val args: Arguments) : RxController(args.bundle) {
 
     @Suppress("unused")
     constructor(bundle: Bundle) : this(Arguments(bundle))
@@ -56,25 +51,15 @@ class DetailController(val args: Arguments) : RxController(args.bundle), DetailM
         return true
     }
 
-    override fun pushEditController(todo: Todo) =
-            router.pushController(EditController.create(todo.uri).routerTransaction()
-                    .pushChangeHandler(FadeChangeHandler())
-                    .popChangeHandler(FadeChangeHandler()))
-
-    fun buildComponent() = activity.component.detailComponent(Module())
+    fun buildComponent() = activity.component.detailComponent(RxControllerModule(this))
 
     class Arguments(bundle: Bundle) : DataBundle(bundle) {
         var uri by bundleString
     }
 
-    @ControllerScope @Subcomponent(modules = arrayOf(Module::class))
-    interface ViewComponent {
+    @ControllerScope @Subcomponent(modules = arrayOf(RxControllerModule::class))
+    interface Component {
         fun inject(viewHolder: DetailPresenter): DetailPresenter
         fun mediator(): DetailMediator
-    }
-
-    @dagger.Module
-    inner class Module : RxControllerModule(this) {
-        @Provides fun navigator(): DetailMediator.Navigator = this@DetailController
     }
 }

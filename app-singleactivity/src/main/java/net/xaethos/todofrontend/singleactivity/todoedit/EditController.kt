@@ -6,7 +6,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import com.bluelinelabs.conductor.rxlifecycle.RxController
-import dagger.Provides
 import dagger.Subcomponent
 import net.xaethos.todofrontend.singleactivity.ControllerScope
 import net.xaethos.todofrontend.singleactivity.R
@@ -17,7 +16,7 @@ import net.xaethos.todofrontend.singleactivity.util.RxControllerModule
 /**
  * Controller: lifecycle, navigation and dependency injection
  */
-class EditController(val args: Arguments) : RxController(args.bundle), EditMediator.Navigator {
+class EditController(val args: Arguments) : RxController(args.bundle) {
 
     @Suppress("unused")
     constructor(bundle: Bundle) : this(Arguments(bundle))
@@ -52,24 +51,15 @@ class EditController(val args: Arguments) : RxController(args.bundle), EditMedia
         return true
     }
 
-    override fun navigateBack() {
-        router.popCurrentController()
-    }
-
-    fun buildComponent() = activity.component.editComponent(Module())
+    fun buildComponent() = activity.component.editComponent(RxControllerModule(this))
 
     class Arguments(bundle: Bundle) : DataBundle(bundle) {
         var uri by bundleString
     }
 
-    @ControllerScope @Subcomponent(modules = arrayOf(Module::class))
-    interface ViewComponent {
+    @ControllerScope @Subcomponent(modules = arrayOf(RxControllerModule::class))
+    interface Component {
         fun inject(viewHolder: EditPresenter): EditPresenter
         fun mediator(): EditMediator
-    }
-
-    @dagger.Module
-    inner class Module : RxControllerModule(this) {
-        @Provides fun navigator(): EditMediator.Navigator = this@EditController
     }
 }
