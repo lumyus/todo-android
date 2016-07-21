@@ -38,9 +38,9 @@ class SingleActivity : AppCompatActivity() {
 
     @ActivityScope @Subcomponent(modules = arrayOf(Module::class))
     interface Component {
-        fun listComponentBuilder(): ListController.ViewComponent.Builder
-        fun detailComponentBuilder(): DetailController.ViewComponent.Builder
-        fun editComponentBuilder(): EditController.ViewComponent.Builder
+        fun listComponent(module: ListController.Module): ListController.ViewComponent
+        fun detailComponent(module: DetailController.Module): DetailController.ViewComponent
+        fun editComponent(module: EditController.Module): EditController.ViewComponent
     }
 
     @dagger.Module

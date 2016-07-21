@@ -35,16 +35,13 @@ class EditController(val args: Arguments) : RxController(args.bundle), EditMedia
         setHasOptionsMenu(true)
     }
 
-    val viewComponent by lazy {
-        activity.component.editComponentBuilder().controllerModule(Module()).build()
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View =
             inflater.inflate(R.layout.presenter_todo_edit, container, false)
 
     override fun onAttach(view: View) {
-        val presenter = viewComponent.inject(EditPresenter(view))
-        viewComponent.mediator().bindPresenter(presenter, args.uri)
+        val component = buildComponent()
+        val presenter = component.inject(EditPresenter(view))
+        component.mediator().bindPresenter(presenter, args.uri)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -59,6 +56,8 @@ class EditController(val args: Arguments) : RxController(args.bundle), EditMedia
         router.popCurrentController()
     }
 
+    fun buildComponent() = activity.component.editComponent(Module())
+
     class Arguments(bundle: Bundle) : DataBundle(bundle) {
         var uri by bundleString
     }
@@ -67,12 +66,6 @@ class EditController(val args: Arguments) : RxController(args.bundle), EditMedia
     interface ViewComponent {
         fun inject(viewHolder: EditPresenter): EditPresenter
         fun mediator(): EditMediator
-
-        @Subcomponent.Builder
-        interface Builder {
-            fun build(): ViewComponent
-            fun controllerModule(module: Module): Builder
-        }
     }
 
     @dagger.Module

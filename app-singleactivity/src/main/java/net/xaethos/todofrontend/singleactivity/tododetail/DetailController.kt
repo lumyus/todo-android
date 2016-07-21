@@ -39,16 +39,13 @@ class DetailController(val args: Arguments) : RxController(args.bundle), DetailM
         setHasOptionsMenu(true)
     }
 
-    val viewComponent by lazy {
-        activity.component.detailComponentBuilder().controllerModule(Module()).build()
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View =
             inflater.inflate(R.layout.presenter_todo_detail, container, false)
 
     override fun onAttach(view: View) {
-        val presenter = viewComponent.inject(DetailPresenter(view))
-        viewComponent.mediator().bindPresenter(presenter, args.uri!!)
+        val component = buildComponent()
+        val presenter = component.inject(DetailPresenter(view))
+        component.mediator().bindPresenter(presenter, args.uri!!)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -64,6 +61,8 @@ class DetailController(val args: Arguments) : RxController(args.bundle), DetailM
                     .pushChangeHandler(FadeChangeHandler())
                     .popChangeHandler(FadeChangeHandler()))
 
+    fun buildComponent() = activity.component.detailComponent(Module())
+
     class Arguments(bundle: Bundle) : DataBundle(bundle) {
         var uri by bundleString
     }
@@ -72,12 +71,6 @@ class DetailController(val args: Arguments) : RxController(args.bundle), DetailM
     interface ViewComponent {
         fun inject(viewHolder: DetailPresenter): DetailPresenter
         fun mediator(): DetailMediator
-
-        @Subcomponent.Builder
-        interface Builder {
-            fun build(): ViewComponent
-            fun controllerModule(module: Module): Builder
-        }
     }
 
     @dagger.Module

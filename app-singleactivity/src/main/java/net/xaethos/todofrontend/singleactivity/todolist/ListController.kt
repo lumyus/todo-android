@@ -35,16 +35,17 @@ import javax.inject.Inject
  * Finally, controllers handle dependency injection for mediators and presenters.
  */
 class ListController() : RxController(), ListMediator.Navigator {
-    val viewComponent by lazy {
-        activity.component.listComponentBuilder().controllerModule(Module()).build()
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View =
             inflater.inflate(R.layout.presenter_todo_list, container, false)
 
     override fun onAttach(view: View) {
-        val presenter = viewComponent.inject(ListPresenter(view))
-        viewComponent.mediator().bindListPresenter(presenter)
+        /*
+        This component holds a reference to the activity, and the controller sometimes outlives
+        the activity, so we create a new one every time.
+        */
+        val component = buildComponent()
+        val presenter = component.inject(ListPresenter(view))
+        component.mediator().bindListPresenter(presenter)
     }
 
     override fun pushDetailController(todo: Todo) =
@@ -56,6 +57,8 @@ class ListController() : RxController(), ListMediator.Navigator {
             router.pushController(EditController.create().routerTransaction()
                     .pushChangeHandler(VerticalChangeHandler())
                     .popChangeHandler(FadeChangeHandler()))
+
+    private fun buildComponent() = activity.component.listComponent(Module())
 
     @ControllerScope
     class Adapter @Inject constructor(
@@ -90,18 +93,12 @@ class ListController() : RxController(), ListMediator.Navigator {
      * The Dagger component providing dependencies for this controller's views.
      *
      * Its lifecycle should match the _view's_ lifecycle: we should create a new
-     * `ViewComponent` instance on each `onCreateView`.
+     * [ViewComponent] instance on each [onCreateView].
      */
     @ControllerScope @Subcomponent(modules = arrayOf(Module::class))
     interface ViewComponent {
         fun inject(presenter: ListPresenter): ListPresenter
         fun mediator(): ListMediator
-
-        @Subcomponent.Builder
-        interface Builder {
-            fun build(): ViewComponent
-            fun controllerModule(module: Module): Builder
-        }
     }
 
     @dagger.Module
