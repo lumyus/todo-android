@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.ViewGroup
 import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Router
+import com.bluelinelabs.conductor.RouterTransaction
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
 import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler
 import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler
@@ -21,7 +22,7 @@ import net.xaethos.todofrontend.singleactivity.todolist.ListController
 import net.xaethos.todofrontend.singleactivity.todolist.ListMediator
 import net.xaethos.todofrontend.singleactivity.util.RxControllerModule
 import net.xaethos.todofrontend.singleactivity.util.bindView
-import net.xaethos.todofrontend.singleactivity.util.routerTransaction
+import net.xaethos.todofrontend.singleactivity.util.pushController
 
 class SingleActivity : AppCompatActivity(), ListMediator.Navigator, DetailMediator.Navigator, EditMediator.Navigator {
 
@@ -36,24 +37,27 @@ class SingleActivity : AppCompatActivity(), ListMediator.Navigator, DetailMediat
 
         router = Conductor.attachRouter(this, container, savedInstanceState)
         if (!router.hasRootController()) {
-            router.setRoot(ListController().routerTransaction())
+            router.setRoot(RouterTransaction.with(ListController()))
         }
     }
 
     override fun pushDetailController(todo: Todo) =
-            router.pushController(DetailController.create(todo.uri).routerTransaction()
-                    .pushChangeHandler(HorizontalChangeHandler())
-                    .popChangeHandler(HorizontalChangeHandler()))
+            router.pushController(DetailController.create(todo.uri)) {
+                pushChangeHandler(HorizontalChangeHandler())
+                popChangeHandler(HorizontalChangeHandler())
+            }
 
     override fun pushCreateController() =
-            router.pushController(EditController.create().routerTransaction()
-                    .pushChangeHandler(VerticalChangeHandler())
-                    .popChangeHandler(FadeChangeHandler()))
+            router.pushController(EditController.create()) {
+                pushChangeHandler(VerticalChangeHandler())
+                popChangeHandler(FadeChangeHandler())
+            }
 
     override fun pushEditController(todo: Todo) =
-            router.pushController(EditController.create(todo.uri).routerTransaction()
-                    .pushChangeHandler(FadeChangeHandler())
-                    .popChangeHandler(FadeChangeHandler()))
+            router.pushController(EditController.create(todo.uri)) {
+                pushChangeHandler(FadeChangeHandler())
+                popChangeHandler(FadeChangeHandler())
+            }
 
     override fun navigateBack() {
         router.popCurrentController()

@@ -1,14 +1,13 @@
 package net.xaethos.todofrontend.singleactivity.util
 
 import com.bluelinelabs.conductor.Controller
+import com.bluelinelabs.conductor.Router
 import com.bluelinelabs.conductor.RouterTransaction
 import com.bluelinelabs.conductor.rxlifecycle.ControllerEvent
 import com.bluelinelabs.conductor.rxlifecycle.RxController
 import dagger.Module
 import dagger.Provides
 import rx.Observable
-
-fun Controller.routerTransaction(): RouterTransaction = RouterTransaction.with(this)
 
 @Module
 open class RxControllerModule(val controller: RxController) {
@@ -17,4 +16,10 @@ open class RxControllerModule(val controller: RxController) {
                 .filter { it == ControllerEvent.DETACH }
                 .map { Unit }
     }
+}
+
+inline fun Router.pushController(controller: Controller, init: RouterTransaction.() -> Unit) {
+    val transaction = RouterTransaction.with(controller)
+    transaction.init()
+    pushController(transaction)
 }
