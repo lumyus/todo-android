@@ -15,7 +15,6 @@ import javax.inject.Inject
 class EditMediator @Inject constructor(val navigator: Navigator) {
     @Inject lateinit var dataSource: TodoDataSource
 
-    var originalTodo: Todo? = null
     var titleValue: String = ""
     var detailsValue: String = ""
 
@@ -24,22 +23,21 @@ class EditMediator @Inject constructor(val navigator: Navigator) {
 
     private fun bindForCreate(presenter: Presenter) {
         presenter.appBarTitle = "New todo"
-        bindFields(presenter)
+        bindFields(presenter, null)
     }
 
     private fun bindForEdit(presenter: Presenter, uri: String) {
         presenter.appBarTitle = "Edit todo"
         dataSource[uri].takeUntil(presenter.detaches).first().subscribeWith {
             onNext { todo ->
-                originalTodo = todo
                 presenter.titleText = todo.title
                 presenter.detailsText = todo.details
-                bindFields(presenter)
+                bindFields(presenter, todo)
             }
         }
     }
 
-    private fun bindFields(presenter: Presenter) {
+    private fun bindFields(presenter: Presenter, originalTodo: Todo?) {
         presenter.fabEnabled = !presenter.titleText.isNullOrBlank()
 
         presenter.titleChanges
