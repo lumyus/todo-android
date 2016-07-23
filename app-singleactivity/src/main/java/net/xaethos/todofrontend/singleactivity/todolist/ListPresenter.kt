@@ -1,6 +1,7 @@
 package net.xaethos.todofrontend.singleactivity.todolist
 
 import android.graphics.Paint
+import android.support.design.widget.CollapsingToolbarLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
@@ -31,9 +32,10 @@ import javax.inject.Inject
  * a second call to [Controller.onCreateView] wouldn't reinitialize the bindings.
  */
 class ListPresenter(override val root: View) : ViewPresenter, ListMediator.ListPresenter {
+    private val appBarLayout: CollapsingToolbarLayout by bindView(R.id.toolbar_layout)
     private val toolbar by bindView<Toolbar>(R.id.toolbar)
-    private val listView by bindView<RecyclerView>(R.id.todo_list)
     private val fab: FloatingActionButton by bindView(R.id.fab)
+    private val listView by bindView<RecyclerView>(R.id.todo_list)
 
     override val fabClicks: Observable<Unit>
         get() = fab.clicks().takeUntil(detaches)
@@ -44,7 +46,8 @@ class ListPresenter(override val root: View) : ViewPresenter, ListMediator.ListP
     @Inject
     fun setUp(activity: SingleActivity) {
         activity.setSupportActionBar(toolbar)
-        toolbar.title = activity.title
+        activity.supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        appBarLayout.title = activity.title
         listView.adapter = adapter
     }
 
