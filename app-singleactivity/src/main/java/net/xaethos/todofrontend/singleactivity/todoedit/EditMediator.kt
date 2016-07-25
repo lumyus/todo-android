@@ -38,20 +38,22 @@ class EditMediator @Inject constructor(val navigator: Navigator) {
     }
 
     private fun bindFields(presenter: Presenter, originalTodo: Todo?) {
-        presenter.fabEnabled = !presenter.titleText.isNullOrBlank()
+        presenter.fabClicks
+                .doOnNext { presenter.fabEnabled = false }
+                .subscribe { submit(originalTodo, titleValue, detailsValue) }
 
         presenter.titleChanges
-                .doOnNext { presenter.fabEnabled = !it.isBlank() }
                 .map { it.toString() }
                 .subscribe { titleValue = it }
+
+        presenter.titleChanges
+                .map(CharSequence?::isNullOrBlank)
+                .distinctUntilChanged()
+                .subscribe { isBlank -> presenter.fabEnabled = !isBlank }
 
         presenter.detailsChanges
                 .map { it.toString() }
                 .subscribe { detailsValue = it }
-
-        presenter.fabClicks
-                .doOnNext { presenter.fabEnabled = false }
-                .subscribe { submit(originalTodo, titleValue, detailsValue) }
     }
 
     private fun submit(originalTodo: Todo?, titleValue: String, detailsValue: String) {

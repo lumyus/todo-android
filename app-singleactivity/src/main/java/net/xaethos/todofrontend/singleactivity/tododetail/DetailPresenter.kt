@@ -1,13 +1,13 @@
 package net.xaethos.todofrontend.singleactivity.tododetail
 
-import android.support.design.widget.CollapsingToolbarLayout
-import android.support.design.widget.FloatingActionButton
-import android.support.v7.widget.Toolbar
+import android.support.v4.view.GravityCompat
+import android.view.Gravity
 import android.view.View
 import android.widget.TextView
-import com.jakewharton.rxbinding.view.clicks
+import net.xaethos.todofrontend.singleactivity.MainActivity
+import net.xaethos.todofrontend.singleactivity.NavigationPresenter
 import net.xaethos.todofrontend.singleactivity.R
-import net.xaethos.todofrontend.singleactivity.SingleActivity
+import net.xaethos.todofrontend.singleactivity.util.LayoutAnchor
 import net.xaethos.todofrontend.singleactivity.util.ViewPresenter
 import net.xaethos.todofrontend.singleactivity.util.bindView
 import net.xaethos.todofrontend.singleactivity.util.textViewText
@@ -18,27 +18,33 @@ import javax.inject.Inject
  * View presenter: UI controls and events
  */
 class DetailPresenter(override val root: View) : ViewPresenter, DetailMediator.Presenter {
-    private val appBarLayout: CollapsingToolbarLayout by bindView(R.id.toolbar_layout)
-    private val toolbar: Toolbar by bindView(R.id.detail_toolbar)
+    @Inject lateinit var navPresenter: NavigationPresenter
+
     private val detailView: TextView by bindView(R.id.todo_detail)
-    private val fab: FloatingActionButton by bindView(R.id.fab)
 
     override var titleText: CharSequence?
-        get() = appBarLayout.title
+        get() = navPresenter.appBarTitle
         set(value) {
-            appBarLayout.title = value
+            navPresenter.appBarTitle = value
         }
 
     override var detailsText by textViewText(detailView)
 
     override val fabClicks: Observable<Unit>
-        get() = fab.clicks().takeUntil(detaches)
+        get() {
+            navPresenter.configureFab {
+                setImageResource(R.drawable.ic_edit_white_24dp)
+                enabled = true
+                gravity = Gravity.CENTER_VERTICAL or GravityCompat.START
+                anchor = LayoutAnchor(navPresenter.container.id, Gravity.TOP or GravityCompat.END)
+            }
+            return navPresenter.fabClicks.takeUntil(detaches)
+        }
 
     @Inject override lateinit var detaches: Observable<Unit>
 
     @Inject
-    fun setUp(activity: SingleActivity) {
-        activity.setSupportActionBar(toolbar)
-        activity.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    fun setUp(activity: MainActivity) {
+        navPresenter.actionBar?.setDisplayHomeAsUpEnabled(true)
     }
 }
