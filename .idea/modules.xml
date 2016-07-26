@@ -2,10 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ToDoFrontend.iml" filepath="$PROJECT_DIR$/ToDoFrontend.iml" />
       <module fileurl="file://$PROJECT_DIR$/app-singleactivity/app-singleactivity.iml" filepath="$PROJECT_DIR$/app-singleactivity/app-singleactivity.iml" />
       <module fileurl="file://$PROJECT_DIR$/app-traditional/app-traditional.iml" filepath="$PROJECT_DIR$/app-traditional/app-traditional.iml" />
       <module fileurl="file://$PROJECT_DIR$/datasource/datasource.iml" filepath="$PROJECT_DIR$/datasource/datasource.iml" />
+      <module fileurl="file://$PROJECT_DIR$/todo-android.iml" filepath="$PROJECT_DIR$/todo-android.iml" />
     </modules>
   </component>
 </project>
