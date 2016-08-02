@@ -15,7 +15,7 @@ class NavigationPresenter(
         override val root: CoordinatorLayout,
         override val detaches: Observable<Unit>) : ViewPresenter {
     private val appBarLayout: CollapsingToolbarLayout by bindView(R.id.toolbar_layout)
-    private val toolbar by bindView<Toolbar>(R.id.toolbar)
+    private val toolbar: Toolbar by bindView(R.id.toolbar)
     private val fab: FloatingActionButton by bindView(R.id.fab)
     private val fabPresenter = presenter(fab)
 
