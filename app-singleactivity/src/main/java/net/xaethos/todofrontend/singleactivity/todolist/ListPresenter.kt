@@ -1,20 +1,18 @@
 package net.xaethos.todofrontend.singleactivity.todolist
 
 import android.graphics.Paint
-import android.support.design.widget.FloatingActionButton
+import android.support.v4.view.GravityCompat
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
+import android.view.Gravity
 import android.view.View
 import android.widget.CheckBox
 import android.widget.TextView
 import com.jakewharton.rxbinding.view.clicks
 import com.jakewharton.rxbinding.widget.checkedChanges
+import net.xaethos.todofrontend.singleactivity.MainActivity
+import net.xaethos.todofrontend.singleactivity.NavigationPresenter
 import net.xaethos.todofrontend.singleactivity.R
-import net.xaethos.todofrontend.singleactivity.SingleActivity
-import net.xaethos.todofrontend.singleactivity.util.ViewHolderPresenter
-import net.xaethos.todofrontend.singleactivity.util.ViewPresenter
-import net.xaethos.todofrontend.singleactivity.util.bindView
-import net.xaethos.todofrontend.singleactivity.util.textViewText
+import net.xaethos.todofrontend.singleactivity.util.*
 import rx.Observable
 import javax.inject.Inject
 
@@ -31,20 +29,28 @@ import javax.inject.Inject
  * a second call to [Controller.onCreateView] wouldn't reinitialize the bindings.
  */
 class ListPresenter(override val root: View) : ViewPresenter, ListMediator.ListPresenter {
-    private val toolbar by bindView<Toolbar>(R.id.toolbar)
+    @Inject lateinit var navPresenter: NavigationPresenter
+
     private val listView by bindView<RecyclerView>(R.id.todo_list)
-    private val fab: FloatingActionButton by bindView(R.id.fab)
 
     override val fabClicks: Observable<Unit>
-        get() = fab.clicks().takeUntil(detaches)
+        get() {
+            navPresenter.configureFab {
+                setImageResource(R.drawable.ic_add_white_24dp)
+                enabled = true
+                gravity = Gravity.BOTTOM or GravityCompat.END
+                anchor = LayoutAnchor.NONE
+            }
+            return navPresenter.fabClicks.takeUntil(detaches)
+        }
 
     @Inject lateinit var adapter: ListController.Adapter
     @Inject override lateinit var detaches: Observable<Unit>
 
     @Inject
-    fun setUp(activity: SingleActivity) {
-        activity.setSupportActionBar(toolbar)
-        toolbar.title = activity.title
+    fun setUp(activity: MainActivity) {
+        navPresenter.actionBar?.setDisplayHomeAsUpEnabled(false)
+        navPresenter.appBarTitle = activity.title
         listView.adapter = adapter
     }
 

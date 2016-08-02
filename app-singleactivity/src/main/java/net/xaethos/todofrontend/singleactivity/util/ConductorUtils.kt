@@ -18,6 +18,10 @@ open class RxControllerModule(val controller: RxController) {
     }
 }
 
+fun Router.pushController(controller: Controller) {
+    pushController(RouterTransaction.with(controller))
+}
+
 inline fun Router.pushController(controller: Controller, init: RouterTransaction.() -> Unit) {
     val transaction = RouterTransaction.with(controller)
     transaction.init()

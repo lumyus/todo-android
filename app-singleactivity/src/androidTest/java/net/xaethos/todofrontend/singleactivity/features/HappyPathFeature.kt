@@ -16,8 +16,8 @@ import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.runner.AndroidJUnit4
 import android.support.v7.widget.RecyclerView
 import android.test.suitebuilder.annotation.LargeTest
+import net.xaethos.todofrontend.singleactivity.MainActivity
 import net.xaethos.todofrontend.singleactivity.R
-import net.xaethos.todofrontend.singleactivity.SingleActivity
 import net.xaethos.todofrontend.singleactivity.test.activityTestRule
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.containsString
@@ -29,7 +29,7 @@ import org.junit.runner.RunWith
 @LargeTest
 class HappyPathFeature {
 
-    @get:Rule var activityRule = activityTestRule<SingleActivity>()
+    @get:Rule var activityRule = activityTestRule<MainActivity>()
 
     @Test fun seeTodoDetails() {
         // Scroll down list and tap on to do
