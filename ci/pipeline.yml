@@ -26,7 +26,9 @@ jobs:
       - get: android-sdk-linux
       - get: todo-android
         trigger: true
-      - task: unittest
-        file: todo-android/ci/test-debug-unittest.yml
+      - task: unit-test
+        file: todo-android/ci/gradle-task.yml
+        params: { GRADLE_TASKS: ":app-singleactivity:testDebugUnitTest" }
       - task: assemble
-        file: todo-android/ci/assemble-debug.yml
+        file: todo-android/ci/gradle-task.yml
+        params: { GRADLE_TASKS: ":app-singleactivity:assembleDebug" }

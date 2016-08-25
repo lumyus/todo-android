@@ -5,4 +5,4 @@ set -e -u -x
 export TERM=dumb
 export ANDROID_HOME="$PWD/android-sdk-linux"
 
-"$PWD/todo-android/gradlew" --no-daemon --project-dir=todo-android "$@"
+"$PWD/todo-android/gradlew" --no-daemon --project-dir=todo-android "$@" $GRADLE_TASKS

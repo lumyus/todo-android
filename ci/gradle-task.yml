@@ -13,4 +13,3 @@ inputs:
 
 run:
   path: todo-android/ci/gradleCI
-  args: [":app-singleactivity:testDebugUnitTest"]
