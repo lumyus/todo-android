@@ -26,5 +26,7 @@ jobs:
       - get: android-sdk-linux
       - get: todo-android
         trigger: true
-      - task: assemble-debug
+      - task: unittest
+        file: todo-android/ci/test-debug-unittest.yml
+      - task: assemble
         file: todo-android/ci/assemble-debug.yml
