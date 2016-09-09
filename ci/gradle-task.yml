@@ -16,3 +16,11 @@ params:
 
 run:
   path: todo-android/ci/gradle-concourse
+
+run:
+  path: sh
+  args:
+    - -euxc
+    - >-
+      ANDROID_HOME="$PWD/android-sdk-linux"
+      todo-android/gradlew --no-daemon --project-dir=todo-android $gradle_args
