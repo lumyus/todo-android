@@ -11,5 +11,8 @@ inputs:
   - name: android-sdk-linux
   - name: todo-android
 
+params:
+  TERM: screen-256color
+
 run:
   path: todo-android/ci/gradle-concourse
