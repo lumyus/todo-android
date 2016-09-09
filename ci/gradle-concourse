@@ -1,0 +1,5 @@
+#!/bin/bash
+set -eux
+
+export ANDROID_HOME="$PWD/android-sdk-linux"
+"$PWD/todo-android/gradlew" --no-daemon --project-dir=todo-android $gradle_args

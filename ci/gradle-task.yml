@@ -12,4 +12,4 @@ inputs:
   - name: todo-android
 
 run:
-  path: todo-android/ci/gradleCI
+  path: todo-android/ci/gradle-concourse
