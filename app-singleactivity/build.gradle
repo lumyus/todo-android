@@ -16,9 +16,9 @@ android {
     }
 
     signingConfigs {
-      debug {
-        storeFile rootProject.file("app.keystore")
-      }
+        debug {
+            storeFile rootProject.file("app.keystore")
+        }
     }
 
     buildTypes {
@@ -48,18 +48,20 @@ dependencies {
     provided 'javax.annotation:jsr250-api:1.0'
     kapt "com.google.dagger:dagger-compiler:$dep.dagger"
     compile "com.google.dagger:dagger:$dep.dagger"
+    compile "com.google.dagger:dagger-android:$dep.dagger"
 
     // Conductor
-    compile 'com.bluelinelabs:conductor:2.0.0'
-    compile 'com.bluelinelabs:conductor-rxlifecycle:2.0.0'
+    compile('com.bluelinelabs:conductor:2.0.0',
+            'com.bluelinelabs:conductor-rxlifecycle:2.0.0')
 
     // Rx
-    compile "io.reactivex:rxjava:$dep.rxJava"
-    compile "io.reactivex:rxkotlin:$dep.rxKotlin"
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'com.jakewharton.rxbinding:rxbinding-kotlin:0.4.0'
+    compile("io.reactivex:rxjava:$dep.rxJava",
+            "io.reactivex:rxkotlin:$dep.rxKotlin",
+            'io.reactivex:rxandroid:1.2.1',
+            'com.jakewharton.rxbinding:rxbinding-kotlin:0.4.0')
 
     testCompile "org.jetbrains.kotlin:kotlin-test:$dep.kotlin"
+
     testCompile 'com.natpryce:hamkrest:1.2.1.0'
 
     testCompile "junit:junit:$dep.junit"
@@ -70,13 +72,15 @@ dependencies {
     androidTestCompile("com.android.support:appcompat-v7:$dep.support",
             "com.android.support:support-v4:$dep.support",
             "com.android.support:recyclerview-v7:$dep.support",
-            "com.android.support:design:$dep.support")
-    androidTestCompile "com.android.support:support-annotations:$dep.support"
-    androidTestCompile "com.android.support.test:runner:$dep.supportTest"
-    androidTestCompile "com.android.support.test:rules:$dep.supportTest"
-    androidTestCompile "com.android.support.test.espresso:espresso-core:$dep.espresso"
-    androidTestCompile "com.android.support.test.espresso:espresso-contrib:$dep.espresso"
-    androidTestCompile "com.android.support.test.espresso:espresso-idling-resource:$dep.espresso"
+            "com.android.support:design:$dep.support",
+            "com.android.support:support-annotations:$dep.support")
+
+    androidTestCompile("com.android.support.test:runner:$dep.supportTest",
+            "com.android.support.test:rules:$dep.supportTest")
+
+    androidTestCompile("com.android.support.test.espresso:espresso-core:$dep.espresso",
+            "com.android.support.test.espresso:espresso-contrib:$dep.espresso",
+            "com.android.support.test.espresso:espresso-idling-resource:$dep.espresso")
 
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
 }

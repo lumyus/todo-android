@@ -18,4 +18,4 @@ interface SingletonComponent {
 val singletonComponent: SingletonComponent = DaggerSingletonComponent.create()
 
 val Activity.component: MainActivity.Component
-    get() = if (this is MainActivity) dependencySource else throw IllegalStateException("Somebody set up us the bomb")
+    get() = if (this is MainActivity) dependencySource else throw IllegalStateException("Somebody set us up the bomb")
